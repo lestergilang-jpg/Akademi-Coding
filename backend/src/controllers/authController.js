@@ -64,7 +64,7 @@ const register = async (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Registrasi berhasil!',
-      data: { token, user: { id: result[0].id, name, email, role, is_active: false } },
+      data: { token, user: { id: result[0].id, name, email, role, is_active: false, avatar_url: null } },
     });
   } catch (error) {
     console.error('Register error:', error);
@@ -112,7 +112,7 @@ const login = async (req, res) => {
       message: 'Login berhasil!',
       data: {
         token,
-        user: { id: user.id, name: user.name, email: user.email, role: user.role, is_active: user.is_active },
+        user: { id: user.id, name: user.name, email: user.email, role: user.role, is_active: user.is_active, avatar_url: user.avatar_url },
       },
     });
   } catch (error) {
@@ -128,7 +128,7 @@ const getMe = async (req, res) => {
 
 // PUT /api/auth/profile (Feature 1)
 const updateProfile = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, currentPassword, password } = req.body;
   const userId = req.user.id;
 
   try {
@@ -142,6 +142,17 @@ const updateProfile = async (req, res) => {
 
     let hashedPassword = undefined;
     if (password) {
+      const { rows: userRows } = await pool.query('SELECT password FROM users WHERE id = $1', [userId]);
+      const dbUser = userRows[0];
+      
+      if (!currentPassword) {
+        return res.status(400).json({ success: false, message: 'Password saat ini wajib diisi untuk keamanan.' });
+      }
+      
+      const isMatch = await bcrypt.compare(currentPassword, dbUser.password);
+      if (!isMatch) {
+        return res.status(400).json({ success: false, message: 'Password saat ini salah.' });
+      }
       hashedPassword = await bcrypt.hash(password, 10);
     }
 
@@ -152,12 +163,29 @@ const updateProfile = async (req, res) => {
       await pool.query('UPDATE users SET name = $1, email = $2 WHERE id = $3', [name, email, userId]);
     }
 
-    const { rows } = await pool.query('SELECT id, name, email, role, is_active FROM users WHERE id = $1', [userId]);
+    const { rows } = await pool.query('SELECT id, name, email, role, is_active, avatar_url FROM users WHERE id = $1', [userId]);
 
     res.json({ success: true, message: 'Profil berhasil diperbarui.', data: { user: rows[0] } });
   } catch (error) {
     console.error('Update profile error:', error);
     res.status(500).json({ success: false, message: 'Terjadi kesalahan saat memperbarui profil.' });
+  }
+};
+
+// PUT /api/auth/profile/avatar
+const updateAvatar = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'Tidak ada file gambar yang diunggah.' });
+    }
+    const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+    await pool.query('UPDATE users SET avatar_url = $1 WHERE id = $2', [avatarUrl, req.user.id]);
+    
+    const { rows } = await pool.query('SELECT id, name, email, role, is_active, avatar_url FROM users WHERE id = $1', [req.user.id]);
+    res.json({ success: true, message: 'Foto profil berhasil diperbarui.', data: { user: rows[0] } });
+  } catch (error) {
+    console.error('Update avatar error:', error);
+    res.status(500).json({ success: false, message: 'Terjadi kesalahan server saat unggah foto.' });
   }
 };
 
@@ -185,4 +213,62 @@ const verifyEmail = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getMe, updateProfile, verifyEmail };
+// POST /api/auth/forgot-password
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ success: false, message: 'Email wajib diisi.' });
+  
+  try {
+    const { rows } = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+    if (!rows.length) {
+      return res.status(404).json({ success: false, message: 'Email tidak ditemukan.' });
+    }
+    
+    const resetToken = uuidv4();
+    const expires = new Date(Date.now() + 15 * 60000); // 15 mins
+    
+    await pool.query(
+      'UPDATE users SET reset_password_token = $1, reset_password_expires = $2 WHERE id = $3',
+      [resetToken, expires, rows[0].id]
+    );
+    
+    const { sendPasswordResetEmail } = require('../utils/mailer');
+    await sendPasswordResetEmail(email, resetToken);
+    
+    res.json({ success: true, message: 'Link reset password telah dikirim ke email Anda.' });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ success: false, message: 'Terjadi kesalahan server.' });
+  }
+};
+
+// POST /api/auth/reset-password
+const resetPassword = async (req, res) => {
+  const { token, newPassword } = req.body;
+  if (!token || !newPassword) return res.status(400).json({ success: false, message: 'Token dan password baru wajib diisi.' });
+  if (newPassword.length < 8) return res.status(400).json({ success: false, message: 'Password minimal 8 karakter.' });
+  
+  try {
+    const { rows } = await pool.query(
+      'SELECT id FROM users WHERE reset_password_token = $1 AND reset_password_expires > NOW()',
+      [token]
+    );
+    
+    if (!rows.length) {
+      return res.status(400).json({ success: false, message: 'Token tidak valid atau sudah kedaluwarsa.' });
+    }
+    
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await pool.query(
+      'UPDATE users SET password = $1, reset_password_token = NULL, reset_password_expires = NULL WHERE id = $2',
+      [hashedPassword, rows[0].id]
+    );
+    
+    res.json({ success: true, message: 'Password berhasil diubah. Silakan login dengan password baru.' });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ success: false, message: 'Terjadi kesalahan server.' });
+  }
+};
+
+module.exports = { register, login, getMe, updateProfile, updateAvatar, verifyEmail, forgotPassword, resetPassword };

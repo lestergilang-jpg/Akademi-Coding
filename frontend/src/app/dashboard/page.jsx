@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import Cookies from 'js-cookie';
@@ -35,12 +35,15 @@ export default function DashboardPage() {
   const [paying, setPaying] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
 
+  const fileInputRef = useRef(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
   // Settings form
-  const [profileData, setProfileData] = useState({ name: '', email: '', password: '' });
+  const [profileData, setProfileData] = useState({ name: '', email: '', currentPassword: '', password: '' });
 
   useEffect(() => {
     if (!authLoading && !user) router.push('/login');
-    if (user) setProfileData({ name: user.name, email: user.email, password: '' });
+    if (user) setProfileData({ name: user.name, email: user.email, currentPassword: '', password: '' });
   }, [user, authLoading, router]);
 
   useEffect(() => {
@@ -117,13 +120,36 @@ export default function DashboardPage() {
     }
   };
 
+  const handleAvatarSelect = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) return toast.error('Ukuran maksimal foto adalah 2MB.');
+    
+    const formData = new FormData();
+    formData.append('avatar', file);
+    
+    setUploadingAvatar(true);
+    try {
+      const { data } = await api.put('/auth/profile/avatar', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      toast.success(data.message);
+      refreshUser();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Gagal mengunggah foto profil.');
+    } finally {
+      setUploadingAvatar(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     try {
        const { data } = await api.put('/auth/profile', profileData);
        toast.success(data.message);
        refreshUser();
-       setProfileData({ ...profileData, password: '' });
+       setProfileData({ ...profileData, currentPassword: '', password: '' });
     } catch (err) {
        toast.error(err.response?.data?.message || 'Update profil gagal');
     }
@@ -161,9 +187,15 @@ export default function DashboardPage() {
           {/* User info */}
           <div className="p-5 border-b border-white/10">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center text-white font-bold">
-                {user.name?.charAt(0).toUpperCase()}
-              </div>
+              {user.avatar_url ? (
+                <div className="w-10 h-10 rounded-full border border-brand-500 overflow-hidden">
+                   <img src={`http://localhost:5000${user.avatar_url}`} alt="Avatar" className="w-full h-full object-cover" />
+                </div>
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center text-white font-bold">
+                  {user.name?.charAt(0).toUpperCase()}
+                </div>
+              )}
               <div className="flex-1 min-w-0">
                 <div className="text-white font-semibold text-sm truncate">{user.name}</div>
                 <div className={`text-xs ${user.is_active ? 'text-green-400' : 'text-yellow-400'}`}>
@@ -308,6 +340,33 @@ export default function DashboardPage() {
             {/* VIEW: SETTINGS */}
             {currentView === 'settings' && (
               <div className="glass-card max-w-lg p-6">
+                <div className="flex items-center gap-6 mb-8">
+                  <div className="relative group cursor-pointer" onClick={() => !uploadingAvatar && fileInputRef.current?.click()}>
+                    {user.avatar_url ? (
+                      <div className="w-20 h-20 rounded-full border-2 border-brand-500 overflow-hidden relative">
+                         <img src={`http://localhost:5000${user.avatar_url}`} alt="Avatar" className="w-full h-full object-cover" />
+                      </div>
+                    ) : (
+                      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center text-white text-2xl font-bold border-2 border-brand-500">
+                         {user.name?.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                       <FiUser className="text-white" size={24} />
+                    </div>
+                    {uploadingAvatar && (
+                       <div className="absolute inset-0 bg-black/80 rounded-full flex items-center justify-center">
+                          <span className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                       </div>
+                    )}
+                    <input type="file" ref={fileInputRef} onChange={handleAvatarSelect} accept="image/*" className="hidden" />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-bold text-lg">Foto Profil</h3>
+                    <p className="text-slate-400 text-xs">Rekomendasi ukuran: 200x200px (Max 2MB)</p>
+                  </div>
+                </div>
+
                 <form onSubmit={handleUpdateProfile} className="space-y-4">
                    <div>
                      <label className="block text-sm text-slate-400 mb-1">Nama Lengkap</label>
@@ -317,9 +376,18 @@ export default function DashboardPage() {
                      <label className="block text-sm text-slate-400 mb-1">Email</label>
                      <input type="email" value={profileData.email} onChange={e=>setProfileData({...profileData, email: e.target.value})} className="input-field w-full" required />
                    </div>
-                   <div>
-                     <label className="block text-sm text-slate-400 mb-1">Password Baru (kosongkan jika tidak diubah)</label>
-                     <input type="password" value={profileData.password} onChange={e=>setProfileData({...profileData, password: e.target.value})} className="input-field w-full" />
+                   <div className="pt-4 mt-4 border-t border-white/10">
+                     <p className="text-white text-sm font-semibold mb-3">Keamanan (Ganti Password)</p>
+                     <div className="space-y-4">
+                       <div>
+                         <label className="block text-sm text-slate-400 mb-1">Password Saat Ini</label>
+                         <input type="password" value={profileData.currentPassword} onChange={e=>setProfileData({...profileData, currentPassword: e.target.value})} className="input-field w-full" placeholder="Wajib diisi jika ingin mengubah profil/password" />
+                       </div>
+                       <div>
+                         <label className="block text-sm text-slate-400 mb-1">Password Baru (kosongkan jika tidak diubah)</label>
+                         <input type="password" value={profileData.password} onChange={e=>setProfileData({...profileData, password: e.target.value})} className="input-field w-full" />
+                       </div>
+                     </div>
                    </div>
                    <button type="submit" className="btn-primary w-full py-2.5">Simpan Perubahan</button>
                  </form>

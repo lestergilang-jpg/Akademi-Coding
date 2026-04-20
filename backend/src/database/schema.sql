@@ -13,7 +13,10 @@ CREATE TABLE IF NOT EXISTS users (
   role VARCHAR(50) DEFAULT 'user',
   is_active BOOLEAN DEFAULT FALSE,
   is_verified BOOLEAN DEFAULT FALSE,
+  avatar_url VARCHAR(500),
   verification_token VARCHAR(255),
+  reset_password_token VARCHAR(255),
+  reset_password_expires TIMESTAMP,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

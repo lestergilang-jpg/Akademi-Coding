@@ -82,6 +82,11 @@ export default function LoginPage() {
                   {showPass ? <FiEyeOff /> : <FiEye />}
                 </button>
               </div>
+              <div className="flex justify-end mt-2">
+                <Link href="/forgot-password" className="text-sm text-brand-400 hover:text-brand-300 transition-colors">
+                  Lupa Password?
+                </Link>
+              </div>
             </div>
 
             <button type="submit" disabled={loading} className="btn-primary w-full justify-center py-3.5 text-base disabled:opacity-60 disabled:cursor-not-allowed">

@@ -32,6 +32,29 @@ const sendVerificationEmail = async (toEmail, token) => {
   await transporter.sendMail(mailOptions);
 };
 
+const sendPasswordResetEmail = async (toEmail, token) => {
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+  const resetLink = `${frontendUrl}/reset-password?token=${token}`;
+
+  const mailOptions = {
+    from: '"Akademi Coding" <noreply@akademicoding.com>',
+    to: toEmail,
+    subject: 'Reset Password Akademi Coding Anda',
+    html: `
+      <h2>Permintaan Reset Password</h2>
+      <p>Anda baru saja meminta untuk mereset password akun Akademi Coding Anda.</p>
+      <p>Klik tombol di bawah ini untuk mengatur ulang password Anda. Tautan ini hanya berlaku selama 15 menit.</p>
+      <a href="${resetLink}" style="display:inline-block; padding:10px 20px; background-color:#5865F2; color:white; text-decoration:none; border-radius:5px;">Reset Password</a>
+      <br/><br/>
+      <p>Jika Anda tidak meminta reset password, abaikan saja email ini.</p>
+      <p>Salam hangat,<br/>Tim Akademi Coding</p>
+    `
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
 module.exports = {
-  sendVerificationEmail
+  sendVerificationEmail,
+  sendPasswordResetEmail
 };
