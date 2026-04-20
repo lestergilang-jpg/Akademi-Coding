@@ -17,8 +17,6 @@ app.use(cors({
   credentials: true,
 }));
 
-// Raw body for Midtrans webhook signature verification
-app.use('/api/transactions/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

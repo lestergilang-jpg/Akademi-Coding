@@ -30,9 +30,9 @@ function PaymentContent() {
           {orderId && <p className="text-slate-600 text-xs mb-6">Order ID: {orderId}</p>}
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             {(status === 'settlement' || status === 'capture') && (
-              <Link href="/dashboard" className="btn-primary justify-center">
+              <a href="/dashboard" className="btn-primary justify-center">
                 <FiBook /> Mulai Belajar
-              </Link>
+              </a>
             )}
             <Link href="/" className="btn-outline justify-center">
               <FiHome /> Kembali ke Beranda

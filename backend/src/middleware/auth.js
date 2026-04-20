@@ -13,7 +13,7 @@ const protect = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const [rows] = await pool.query('SELECT id, name, email, role, is_active FROM users WHERE id = ?', [decoded.id]);
+    const { rows } = await pool.query('SELECT id, name, email, role, is_active, discord_id, discord_username FROM users WHERE id = $1', [decoded.id]);
 
     if (!rows.length) {
       return res.status(401).json({ success: false, message: 'Token tidak valid.' });

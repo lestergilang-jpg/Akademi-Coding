@@ -2,12 +2,14 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import Cookies from 'js-cookie';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import {
   FiCode, FiPlay, FiLock, FiCheckCircle, FiZap,
   FiLogOut, FiShoppingCart, FiBook, FiAward, FiClock,
+  FiUser, FiList, FiSettings
 } from 'react-icons/fi';
 
 function LoadingSpinner() {
@@ -21,42 +23,86 @@ function LoadingSpinner() {
 export default function DashboardPage() {
   const { user, logout, loading: authLoading, refreshUser } = useAuth();
   const router = useRouter();
-  const [course, setCourse] = useState(null);
+  
+  // Views: 'courses', 'course_detail', 'transactions', 'settings'
+  const [currentView, setCurrentView] = useState('courses');
+  
+  const [allCourses, setAllCourses] = useState([]);
+  const [course, setCourse] = useState(null); // specific course for detail view
   const [selectedLesson, setSelectedLesson] = useState(null);
+  const [transactions, setTransactions] = useState([]);
+  
   const [paying, setPaying] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
 
+  // Settings form
+  const [profileData, setProfileData] = useState({ name: '', email: '', password: '' });
+
   useEffect(() => {
     if (!authLoading && !user) router.push('/login');
+    if (user) setProfileData({ name: user.name, email: user.email, password: '' });
   }, [user, authLoading, router]);
 
   useEffect(() => {
-    if (user) {
-      api.get('/courses/1')
-        .then(({ data }) => {
-          setCourse(data.data);
-          const firstUnlocked = data.data.lessons?.find(l => !l.is_locked || l.is_preview);
-          if (firstUnlocked) setSelectedLesson(firstUnlocked);
-        })
-        .catch(() => toast.error('Gagal memuat kursus'))
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('discord') === 'success') {
+        toast.success('Berhasil menghubungkan akun Discord!');
+        refreshUser();
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } else if (urlParams.get('discord') === 'error') {
+        toast.error('Gagal menghubungkan Discord.');
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user && currentView === 'courses') {
+      setPageLoading(true);
+      api.get('/courses')
+        .then(({ data }) => setAllCourses(data.data))
+        .catch(() => toast.error('Gagal memuat katalog kursus'))
         .finally(() => setPageLoading(false));
     }
-  }, [user]);
+  }, [user, currentView]);
 
-  const handleBuy = async () => {
+  useEffect(() => {
+    if (user && currentView === 'transactions') {
+      setPageLoading(true);
+      api.get('/transactions/my')
+        .then(({ data }) => setTransactions(data.data))
+        .catch(() => toast.error('Gagal memuat riwayat transaksi'))
+        .finally(() => setPageLoading(false));
+    }
+  }, [user, currentView]);
+
+  const loadCourseDetail = (courseId) => {
+    setPageLoading(true);
+    api.get(`/courses/${courseId}`)
+      .then(({ data }) => {
+        setCourse(data.data);
+        const firstUnlocked = data.data.lessons?.find(l => !l.is_locked || l.is_preview);
+        if (firstUnlocked) setSelectedLesson(firstUnlocked);
+        setCurrentView('course_detail');
+      })
+      .catch(() => toast.error('Gagal memuat detail kursus'))
+      .finally(() => setPageLoading(false));
+  };
+
+  const handleBuy = async (courseIdToBuy) => {
     setPaying(true);
     try {
-      const { data } = await api.post('/transactions/create', { course_id: 1 });
-      // Load Midtrans Snap
+      const { data } = await api.post('/transactions/create', { course_id: courseIdToBuy || 1 });
       const script = document.createElement('script');
       script.src = 'https://app.sandbox.midtrans.com/snap/snap.js';
       script.setAttribute('data-client-key', process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY);
       script.onload = () => {
         window.snap.pay(data.data.snap_token, {
           onSuccess: async () => {
-            toast.success('Pembayaran berhasil! 🎉 Mengaktifkan akses...');
-            await refreshUser();
-            window.location.reload();
+             toast.success('Pembayaran berhasil! 🎉 Mengaktifkan akses...');
+             await refreshUser();
+             window.location.reload();
           },
           onPending: () => toast('Pembayaran pending. Cek email kamu.', { icon: '⏳' }),
           onError: () => toast.error('Pembayaran gagal. Coba lagi.'),
@@ -71,12 +117,30 @@ export default function DashboardPage() {
     }
   };
 
-  if (authLoading || pageLoading) return <LoadingSpinner />;
-  if (!user) return null;
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    try {
+       const { data } = await api.put('/auth/profile', profileData);
+       toast.success(data.message);
+       refreshUser();
+       setProfileData({ ...profileData, password: '' });
+    } catch (err) {
+       toast.error(err.response?.data?.message || 'Update profil gagal');
+    }
+  };
 
-  const completedLessons = 0;
-  const totalLessons = course?.lessons?.length || 0;
-  const progress = totalLessons ? Math.round((completedLessons / totalLessons) * 100) : 0;
+  const handleDiscordLink = () => {
+    const token = Cookies.get('token');
+    if (!token) {
+      toast.error('Gagal mengambil token. Silakan login ulang.');
+      return;
+    }
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    window.location.href = `${apiUrl}/auth/discord/link?token=${token}`;
+  };
+
+  if (authLoading || (pageLoading && currentView === 'courses' && allCourses.length===0)) return <LoadingSpinner />;
+  if (!user) return null;
 
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
@@ -98,52 +162,61 @@ export default function DashboardPage() {
           <div className="p-5 border-b border-white/10">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center text-white font-bold">
-                {user.name.charAt(0).toUpperCase()}
+                {user.name?.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-white font-semibold text-sm truncate">{user.name}</div>
                 <div className={`text-xs ${user.is_active ? 'text-green-400' : 'text-yellow-400'}`}>
-                  {user.is_active ? '✓ Member Aktif' : '⚡ Belum Premium'}
+                  {user.is_active ? '✓ Member Premium' : '⚡ Member Biasa'}
                 </div>
-              </div>
-            </div>
-            {/* Progress bar */}
-            <div className="mt-4">
-              <div className="flex justify-between text-xs text-slate-400 mb-1">
-                <span>Progress</span><span>{progress}%</span>
-              </div>
-              <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-brand-500 to-accent-500 rounded-full transition-all" style={{ width: `${progress}%` }} />
               </div>
             </div>
           </div>
 
-          {/* Lesson list */}
+          {/* Menu list */}
           <div className="flex-1 overflow-y-auto p-3">
-            <p className="text-slate-500 text-xs uppercase tracking-wider mb-3 px-2">Materi Kursus</p>
+            <p className="text-slate-500 text-xs uppercase tracking-wider mb-3 px-2">Menu Utama</p>
             <div className="space-y-1">
-              {course?.lessons?.map(lesson => {
-                const isAccessible = !lesson.is_locked || lesson.is_preview || user.is_active;
-                const isSelected = selectedLesson?.id === lesson.id;
-                return (
-                  <button
-                    key={lesson.id}
-                    onClick={() => isAccessible ? setSelectedLesson(lesson) : toast.error('Beli akses premium untuk membuka materi ini!')}
-                    className={`w-full text-left flex items-center gap-2 p-2.5 rounded-lg text-sm transition-all
-                      ${isSelected ? 'bg-brand-500/20 text-brand-300 border border-brand-500/30' : 'text-slate-400 hover:bg-white/5 hover:text-white'}
-                      ${!isAccessible ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-                    `}
-                  >
-                    {isAccessible
-                      ? <FiPlay size={12} className="flex-shrink-0 text-brand-400" />
-                      : <FiLock size={12} className="flex-shrink-0 text-slate-600" />
-                    }
-                    <span className="truncate">{lesson.title}</span>
-                    {lesson.is_preview && <span className="ml-auto text-xs text-green-400 flex-shrink-0">FREE</span>}
-                  </button>
-                );
-              })}
+              <button onClick={() => setCurrentView('courses')} className={`w-full text-left flex items-center gap-2 p-2.5 rounded-lg text-sm transition-all ${currentView === 'courses' ? 'bg-brand-500/20 text-brand-300' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
+                <FiBook /> Katalog Kursus
+              </button>
+              {course && currentView === 'course_detail' && (
+                <button className="w-full text-left flex items-center gap-2 p-2.5 rounded-lg text-sm transition-all bg-brand-500/20 text-brand-300">
+                  <FiPlay /> Sedang Belajar: {course.title.substring(0,15)}...
+                </button>
+              )}
+              <button onClick={() => setCurrentView('transactions')} className={`w-full text-left flex items-center gap-2 p-2.5 rounded-lg text-sm transition-all ${currentView === 'transactions' ? 'bg-brand-500/20 text-brand-300' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
+                <FiList /> Riwayat Transaksi
+              </button>
+              <button onClick={() => setCurrentView('settings')} className={`w-full text-left flex items-center gap-2 p-2.5 rounded-lg text-sm transition-all ${currentView === 'settings' ? 'bg-brand-500/20 text-brand-300' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
+                <FiSettings /> Pengaturan Profil
+              </button>
             </div>
+            
+            {currentView === 'course_detail' && course && (
+               <div className="mt-6">
+                 <p className="text-slate-500 text-xs uppercase tracking-wider mb-3 px-2">Materi</p>
+                 <div className="space-y-1">
+                   {course.lessons?.map(lesson => {
+                     const isAccessible = !lesson.is_locked || lesson.is_preview || user.is_active;
+                     const isSelected = selectedLesson?.id === lesson.id;
+                     return (
+                       <button
+                         key={lesson.id}
+                         onClick={() => isAccessible ? setSelectedLesson(lesson) : toast.error('Beli akses untuk membuka materi ini!')}
+                         className={`w-full text-left flex items-center gap-2 p-2.5 rounded-lg text-sm transition-all
+                           ${isSelected ? 'bg-brand-500/20 text-brand-300 border border-brand-500/30' : 'text-slate-400 hover:bg-white/5 hover:text-white'}
+                           ${!isAccessible ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                         `}
+                       >
+                         {isAccessible ? <FiPlay size={12} className="flex-shrink-0 text-brand-400"/> : <FiLock size={12} className="flex-shrink-0 text-slate-600"/>}
+                         <span className="truncate">{lesson.title}</span>
+                       </button>
+                     );
+                   })}
+                 </div>
+               </div>
+            )}
           </div>
 
           {/* Logout */}
@@ -159,83 +232,180 @@ export default function DashboardPage() {
           {/* Top bar */}
           <div className="bg-[#0d0d1a] border-b border-white/10 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
             <div>
-              <h1 className="text-white font-bold">Dashboard Belajar</h1>
-              <p className="text-slate-400 text-sm">{selectedLesson?.title || 'Pilih materi untuk mulai'}</p>
+              <h1 className="text-white font-bold text-lg">
+                {currentView === 'courses' ? 'Katalog Kursus' : currentView === 'course_detail' ? course?.title : currentView === 'transactions' ? 'Riwayat Transaksi' : 'Pengaturan Profil'}
+              </h1>
             </div>
-            {!user.is_active && (
-              <button onClick={handleBuy} disabled={paying} className="btn-primary py-2 px-4 text-sm">
-                {paying ? <span className="flex items-center gap-2"><span className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" />Loading...</span> : <><FiZap size={14} />Upgrade Premium</>}
-              </button>
-            )}
           </div>
 
           <div className="p-6">
-            {/* Stats cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              {[
-                { label: 'Total Materi', value: totalLessons, icon: FiBook, color: 'text-brand-400' },
-                { label: 'Progress', value: `${progress}%`, icon: FiCheckCircle, color: 'text-green-400' },
-                { label: 'Status', value: user.is_active ? 'Premium' : 'Free', icon: FiAward, color: user.is_active ? 'text-yellow-400' : 'text-slate-400' },
-                { label: 'Durasi', value: '100+ Jam', icon: FiClock, color: 'text-accent-400' },
-              ].map(({ label, value, icon: Icon, color }) => (
-                <div key={label} className="glass-card p-4">
-                  <Icon size={18} className={`${color} mb-2`} />
-                  <div className={`text-xl font-bold ${color}`}>{value}</div>
-                  <div className="text-slate-500 text-xs mt-0.5">{label}</div>
-                </div>
-              ))}
-            </div>
+            
+            {/* VIEW: CATALOG COURSES */}
+            {currentView === 'courses' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                 {allCourses.map(c => (
+                   <div key={c.id} className="glass-card flex flex-col overflow-hidden">
+                     <div className="h-40 bg-gradient-to-br from-brand-600/40 to-accent-600/40 flex items-center justify-center">
+                        <FiBook size={48} className="text-white/50" />
+                     </div>
+                     <div className="p-5 flex-1 flex flex-col">
+                        <h3 className="text-white font-bold text-lg mb-2">{c.title}</h3>
+                        <p className="text-slate-400 text-sm mb-4 line-clamp-3">{c.description}</p>
+                        <div className="mt-auto pt-4 border-t border-white/10 flex justify-between items-center">
+                           <span className="text-brand-400 font-bold">Rp {parseInt(c.price).toLocaleString('id-ID')}</span>
+                           <button onClick={() => loadCourseDetail(c.id)} className="btn-primary py-1.5 px-4 text-sm">Lihat Detail</button>
+                        </div>
+                     </div>
+                   </div>
+                 ))}
+              </div>
+            )}
 
-            {/* Video Player */}
-            {selectedLesson ? (
-              <div className="glass-card overflow-hidden mb-6">
-                {selectedLesson.video_url ? (
-                  <div className="aspect-video w-full bg-black">
-                    <iframe
-                      src={selectedLesson.video_url}
-                      className="w-full h-full"
-                      allowFullScreen
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
-                    />
+            {/* VIEW: TRANSACTIONS */}
+            {currentView === 'transactions' && (
+              <div className="glass-card overflow-hidden">
+                <table className="w-full text-left text-sm text-slate-400">
+                  <thead className="bg-white/5 text-slate-300 uppercase">
+                    <tr>
+                      <th className="px-6 py-4">ID Transaksi</th>
+                      <th className="px-6 py-4">Kursus</th>
+                      <th className="px-6 py-4">Nominal</th>
+                      <th className="px-6 py-4">Status</th>
+                      <th className="px-6 py-4">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {transactions.length === 0 && (
+                      <tr><td colSpan="5" className="text-center py-8">Belum ada transaksi.</td></tr>
+                    )}
+                    {transactions.map(t => (
+                      <tr key={t.id} className="border-t border-white/10 hover:bg-white/5">
+                        <td className="px-6 py-4">{t.id}</td>
+                        <td className="px-6 py-4">{t.course_title || 'Unknown Course'}</td>
+                        <td className="px-6 py-4">Rp {parseFloat(t.amount).toLocaleString('id-ID')}</td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2 py-1 rounded text-xs
+                             ${t.status==='success'?'bg-green-500/20 text-green-400' :
+                               t.status==='pending'?'bg-yellow-500/20 text-yellow-400' :
+                               'bg-red-500/20 text-red-400'}`}>
+                             {t.status.toUpperCase()}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          {(t.status === 'failed' || t.status === 'cancel' || t.status === 'expire') && (
+                            <button onClick={() => handleBuy(t.course_id)} className="text-brand-400 hover:text-brand-300 text-xs flex items-center gap-1">
+                              <FiShoppingCart /> Bayar Ulang
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* VIEW: SETTINGS */}
+            {currentView === 'settings' && (
+              <div className="glass-card max-w-lg p-6">
+                <form onSubmit={handleUpdateProfile} className="space-y-4">
+                   <div>
+                     <label className="block text-sm text-slate-400 mb-1">Nama Lengkap</label>
+                     <input type="text" value={profileData.name} onChange={e=>setProfileData({...profileData, name: e.target.value})} className="input-field w-full" required />
+                   </div>
+                   <div>
+                     <label className="block text-sm text-slate-400 mb-1">Email</label>
+                     <input type="email" value={profileData.email} onChange={e=>setProfileData({...profileData, email: e.target.value})} className="input-field w-full" required />
+                   </div>
+                   <div>
+                     <label className="block text-sm text-slate-400 mb-1">Password Baru (kosongkan jika tidak diubah)</label>
+                     <input type="password" value={profileData.password} onChange={e=>setProfileData({...profileData, password: e.target.value})} className="input-field w-full" />
+                   </div>
+                   <button type="submit" className="btn-primary w-full py-2.5">Simpan Perubahan</button>
+                 </form>
+                 
+                 {/* Discord Integration Section */}
+                 <div className="mt-8 pt-6 border-t border-white/10">
+                   <h3 className="text-white font-bold mb-2">Integrasi Discord</h3>
+                   <p className="text-slate-400 text-sm mb-4">
+                     Hubungkan akun Discord kamu untuk bergabung secara otomatis ke komunitas eksklusif dan mendapatkan role Premium (jika sudah berlangganan).
+                   </p>
+                   {user.discord_id ? (
+                     <div className="bg-[#5865F2]/20 border border-[#5865F2]/30 rounded-lg p-4 flex items-center justify-between">
+                       <div className="flex items-center gap-3">
+                         <div className="w-10 h-10 rounded-full bg-[#5865F2] flex items-center justify-center text-white font-bold">
+                           {user.discord_username?.charAt(0).toUpperCase()}
+                         </div>
+                         <div>
+                           <p className="text-white font-medium text-sm">Terhubung dengan Discord</p>
+                           <p className="text-[#5865F2] text-xs">@{user.discord_username}</p>
+                         </div>
+                       </div>
+                       <div className="badge bg-green-500/20 text-green-400 border-none">Terkoneksi</div>
+                     </div>
+                   ) : (
+                     <button onClick={handleDiscordLink} className="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white py-2.5 rounded-lg flex items-center justify-center gap-2 font-medium transition-colors">
+                       Hubungkan akun Discord
+                     </button>
+                   )}
+                 </div>
+              </div>
+            )}
+
+            {/* VIEW: COURSE DETAIL (VIDEO PLAYER) */}
+            {currentView === 'course_detail' && (
+              <div>
+                {selectedLesson ? (
+                  <div className="glass-card overflow-hidden mb-6">
+                    {selectedLesson.video_url ? (
+                      <div className="aspect-video w-full bg-black">
+                        <iframe
+                          src={selectedLesson.video_url}
+                          className="w-full h-full"
+                          allowFullScreen
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
+                        />
+                      </div>
+                    ) : (
+                      <div className="aspect-video bg-[#13131f] flex flex-col items-center justify-center text-slate-500">
+                        <FiLock size={40} className="mb-3" />
+                        <p className="font-semibold text-white">Materi Terkunci</p>
+                        <p className="text-sm mt-1">Upgrade / Beli kursus ini untuk akses materi</p>
+                      </div>
+                    )}
+                    <div className="p-5">
+                      <h2 className="text-white font-bold text-xl">{selectedLesson.title}</h2>
+                      {selectedLesson.description && <p className="text-slate-400 mt-2 text-sm">{selectedLesson.description}</p>}
+                      <div className="flex gap-2 mt-3">
+                        {selectedLesson.is_preview && <span className="badge">Preview Gratis</span>}
+                        {selectedLesson.duration > 0 && <span className="text-slate-500 text-xs flex items-center gap-1"><FiClock size={10} /> {selectedLesson.duration} menit</span>}
+                      </div>
+                    </div>
                   </div>
                 ) : (
-                  <div className="aspect-video bg-[#13131f] flex flex-col items-center justify-center text-slate-500">
-                    <FiLock size={40} className="mb-3" />
-                    <p className="font-semibold text-white">Materi Terkunci</p>
-                    <p className="text-sm mt-1">Upgrade ke premium untuk akses materi ini</p>
+                  <div className="glass-card p-12 text-center">
+                    <FiPlay size={48} className="text-brand-400 mx-auto mb-4" />
+                    <h2 className="text-white font-bold text-xl mb-2">Pilih Materi untuk Mulai</h2>
                   </div>
                 )}
-                <div className="p-5">
-                  <h2 className="text-white font-bold text-xl">{selectedLesson.title}</h2>
-                  {selectedLesson.description && <p className="text-slate-400 mt-2 text-sm">{selectedLesson.description}</p>}
-                  <div className="flex gap-2 mt-3">
-                    {selectedLesson.is_preview && <span className="badge">Preview Gratis</span>}
-                    {selectedLesson.duration > 0 && <span className="text-slate-500 text-xs flex items-center gap-1"><FiClock size={10} /> {selectedLesson.duration} menit</span>}
+
+                {/* Paywall banner */}
+                {!user.is_active && (
+                  <div className="glass-card p-6 border-brand-500/30 bg-gradient-to-r from-brand-500/10 to-accent-500/10 mt-6">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                      <div className="flex-1">
+                        <h3 className="text-white font-bold text-lg">🔒 Buka Semua Materi</h3>
+                        <p className="text-slate-400 text-sm mt-1">Kamu baru bisa akses materi preview. Beli sekarang untuk buka seluruh modul.</p>
+                      </div>
+                      <button onClick={()=>handleBuy(course.id)} disabled={paying} className="btn-primary flex-shrink-0">
+                        {paying ? 'Loading...' : <><FiShoppingCart /> Beli Sekarang — Rp {parseInt(course.price).toLocaleString('id-ID')}</>}
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </div>
-            ) : (
-              <div className="glass-card p-12 text-center">
-                <FiPlay size={48} className="text-brand-400 mx-auto mb-4" />
-                <h2 className="text-white font-bold text-xl mb-2">Pilih Materi untuk Mulai</h2>
-                <p className="text-slate-400">Klik materi di sidebar kiri untuk mulai belajar</p>
+                )}
               </div>
             )}
 
-            {/* Paywall banner */}
-            {!user.is_active && (
-              <div className="glass-card p-6 border-brand-500/30 bg-gradient-to-r from-brand-500/10 to-accent-500/10">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                  <div className="flex-1">
-                    <h3 className="text-white font-bold text-lg">🔒 Buka Semua Materi</h3>
-                    <p className="text-slate-400 text-sm mt-1">Kamu hanya bisa akses 2 materi preview. Upgrade untuk buka semua 16 modul + project nyata.</p>
-                  </div>
-                  <button onClick={handleBuy} disabled={paying} className="btn-primary flex-shrink-0">
-                    <FiShoppingCart /> Beli Sekarang — Rp 299.000
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         </main>
       </div>

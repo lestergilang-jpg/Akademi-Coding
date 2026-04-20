@@ -2,10 +2,13 @@ const express = require('express');
 const router = express.Router();
 const { protect, adminOnly } = require('../middleware/auth');
 const {
-  getCourses, getCourse, getLesson,
+  getMyCourses, getCourses, getCourse, getLesson,
   adminGetAllCourses, adminCreateCourse, adminUpdateCourse, adminDeleteCourse,
   adminCreateLesson, adminUpdateLesson, adminDeleteLesson,
 } = require('../controllers/courseController');
+
+// Protected routes
+router.get('/my', protect, getMyCourses);
 
 // Public / optional auth
 router.get('/', getCourses);
@@ -18,8 +21,8 @@ router.get('/:id', (req, res, next) => {
     const token = authHeader.split(' ')[1];
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      pool.query('SELECT id, name, email, role, is_active FROM users WHERE id = ?', [decoded.id])
-        .then(([rows]) => { req.user = rows[0]; next(); })
+      pool.query('SELECT id, name, email, role, is_active FROM users WHERE id = $1', [decoded.id])
+        .then(({ rows }) => { req.user = rows[0]; next(); })
         .catch(() => next());
     } catch { next(); }
   } else next();

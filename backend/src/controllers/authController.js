@@ -18,22 +18,22 @@ const register = async (req, res) => {
   }
 
   try {
-    const [existing] = await pool.query('SELECT id FROM users WHERE email = ?', [email]);
+    const { rows: existing } = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
     if (existing.length) {
       return res.status(409).json({ success: false, message: 'Email sudah terdaftar.' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const [result] = await pool.query(
-      'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
+    const { rows: result } = await pool.query(
+      'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id',
       [name, email, hashedPassword]
     );
 
-    const token = generateToken(result.insertId);
+    const token = generateToken(result[0].id);
     res.status(201).json({
       success: true,
       message: 'Registrasi berhasil!',
-      data: { token, user: { id: result.insertId, name, email, role: 'user', is_active: false } },
+      data: { token, user: { id: result[0].id, name, email, role: 'user', is_active: false } },
     });
   } catch (error) {
     console.error('Register error:', error);
@@ -50,7 +50,7 @@ const login = async (req, res) => {
   }
 
   try {
-    const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+    const { rows } = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     if (!rows.length) {
       return res.status(401).json({ success: false, message: 'Email atau password salah.' });
     }
@@ -81,4 +81,39 @@ const getMe = async (req, res) => {
   res.json({ success: true, data: { user: req.user } });
 };
 
-module.exports = { register, login, getMe };
+// PUT /api/auth/profile (Feature 1)
+const updateProfile = async (req, res) => {
+  const { name, email, password } = req.body;
+  const userId = req.user.id;
+
+  try {
+    // Check if email belongs to someone else
+    if (email) {
+      const { rows: existing } = await pool.query('SELECT id FROM users WHERE email = $1 AND id != $2', [email, userId]);
+      if (existing.length) {
+        return res.status(400).json({ success: false, message: 'Email sudah digunakan pengguna lain.' });
+      }
+    }
+
+    let hashedPassword = undefined;
+    if (password) {
+      hashedPassword = await bcrypt.hash(password, 10);
+    }
+
+    // Dynamic update
+    if (name && email && hashedPassword) {
+      await pool.query('UPDATE users SET name = $1, email = $2, password = $3 WHERE id = $4', [name, email, hashedPassword, userId]);
+    } else if (name && email) {
+      await pool.query('UPDATE users SET name = $1, email = $2 WHERE id = $3', [name, email, userId]);
+    }
+
+    const { rows } = await pool.query('SELECT id, name, email, role, is_active FROM users WHERE id = $1', [userId]);
+
+    res.json({ success: true, message: 'Profil berhasil diperbarui.', data: { user: rows[0] } });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    res.status(500).json({ success: false, message: 'Terjadi kesalahan saat memperbarui profil.' });
+  }
+};
+
+module.exports = { register, login, getMe, updateProfile };
