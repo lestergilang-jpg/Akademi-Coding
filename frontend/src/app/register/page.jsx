@@ -31,9 +31,14 @@ export default function RegisterPage() {
     if (form.password.length < 8) return toast.error('Password minimal 8 karakter');
     setLoading(true);
     try {
-      await register(form.name, form.email, form.password);
-      toast.success('Akun berhasil dibuat! 🎉');
-      router.push('/dashboard');
+      const res = await register(form.name, form.email, form.password);
+      if (res?.requireVerification) {
+        toast.success('Cek Email Anda! Link verifikasi telah dikirim.', { duration: 6000 });
+        router.push('/login?registered=true');
+      } else {
+        toast.success('Akun berhasil dibuat! 🎉');
+        router.push('/dashboard');
+      }
     } catch (err) {
       toast.error(err.response?.data?.message || 'Registrasi gagal. Coba lagi.');
     } finally {

@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { v4: uuidv4 } = require('uuid');
 const { pool } = require('../config/database');
+const { sendVerificationEmail } = require('../utils/mailer');
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
@@ -24,16 +26,45 @@ const register = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const verificationToken = uuidv4();
+
     const { rows: result } = await pool.query(
-      'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id',
-      [name, email, hashedPassword]
+      'INSERT INTO users (name, email, password, is_verified, verification_token) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+      [name, email, hashedPassword, false, verificationToken]
     );
+
+    const adminEmails = (process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase());
+    let role = 'user';
+    let is_verified = false;
+    
+    // Auto-verify and promote if admin email
+    if (adminEmails.includes(email.toLowerCase())) {
+      role = 'admin';
+      is_verified = true;
+      await pool.query("UPDATE users SET role = 'admin', is_verified = TRUE WHERE id = $1", [result[0].id]);
+    } else {
+      // Send the verification email to normal users
+      try {
+        await sendVerificationEmail(email, verificationToken);
+      } catch (err) {
+        console.error('Failed to send email:', err);
+      }
+    }
+
+    // Do NOT return a token for unverified normal users to prevent auto-login
+    if (!is_verified) {
+      return res.status(201).json({
+        success: true,
+        message: 'Registrasi berhasil! Silakan cek kotak masuk atau folder spam email Anda untuk link verifikasi sebelum login.',
+        data: null
+      });
+    }
 
     const token = generateToken(result[0].id);
     res.status(201).json({
       success: true,
       message: 'Registrasi berhasil!',
-      data: { token, user: { id: result[0].id, name, email, role: 'user', is_active: false } },
+      data: { token, user: { id: result[0].id, name, email, role, is_active: false } },
     });
   } catch (error) {
     console.error('Register error:', error);
@@ -59,6 +90,20 @@ const login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ success: false, message: 'Email atau password salah.' });
+    }
+
+    // Check .env for auto-admin (also auto-verifies them)
+    const adminEmails = (process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase());
+    if (adminEmails.includes(user.email.toLowerCase())) {
+      if (user.role !== 'admin' || !user.is_verified) {
+        user.role = 'admin';
+        user.is_verified = true;
+        await pool.query("UPDATE users SET role = 'admin', is_verified = TRUE WHERE id = $1", [user.id]);
+      }
+    }
+
+    if (!user.is_verified) {
+      return res.status(401).json({ success: false, message: 'Akun Anda belum terverifikasi. Silakan cek email Anda.' });
     }
 
     const token = generateToken(user.id);
@@ -116,4 +161,28 @@ const updateProfile = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getMe, updateProfile };
+// GET /api/auth/verify-email
+const verifyEmail = async (req, res) => {
+  const { token } = req.query;
+  const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+  if (!token) {
+    return res.redirect(`${FRONTEND_URL}/login?verify=error`);
+  }
+
+  try {
+    const { rows } = await pool.query('SELECT id FROM users WHERE verification_token = $1 AND is_verified = FALSE', [token]);
+    
+    if (!rows.length) {
+      return res.redirect(`${FRONTEND_URL}/login?verify=invalid`);
+    }
+
+    await pool.query('UPDATE users SET is_verified = TRUE, verification_token = NULL WHERE id = $1', [rows[0].id]);
+    res.redirect(`${FRONTEND_URL}/login?verify=success`);
+  } catch (err) {
+    console.error('Verify Email Error:', err);
+    res.redirect(`${FRONTEND_URL}/login?verify=error`);
+  }
+};
+
+module.exports = { register, login, getMe, updateProfile, verifyEmail };

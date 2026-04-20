@@ -30,9 +30,12 @@ export function AuthProvider({ children }) {
 
   const register = async (name, email, password) => {
     const { data } = await api.post('/auth/register', { name, email, password });
-    Cookies.set('token', data.data.token, { expires: 7 });
-    setUser(data.data.user);
-    return data.data.user;
+    if (data.data && data.data.token) {
+      Cookies.set('token', data.data.token, { expires: 7 });
+      setUser(data.data.user);
+      return { user: data.data.user, requireVerification: false };
+    }
+    return { requireVerification: true, message: data.message };
   };
 
   const logout = () => {

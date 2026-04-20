@@ -36,3 +36,8 @@ Sebelum saya mulai menuliskan kode _backend_-nya, mohon konfirmasi beberapa hal 
    Sesudah user mengklik URL konfirmasi dari kotak masuk email mereka, apakah Anda mau mereka dilempar / di-redirect otomatis ke halaman login frontend web Anda?
 
 Tolong berikan jawabannya ya! Begitu *fix*, saya bisa langsung mengatur ulang _Backend_ sekaligus menghubungkan _Nodemailer_-nya.
+
+
+1. saya mau pakai mailtrap sandbox dulu aja (bantu saya setup nya juga ya)
+2. user lama otomatis sudah terverifikasi (auto-verified)
+3. sesudah user mengklik URL konfirmasi dari kotak masuk email mereka, saya mau mereka dilempar / di-redirect otomatis ke halaman login frontend web saya

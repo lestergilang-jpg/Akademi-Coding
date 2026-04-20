@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS users (
   discord_username VARCHAR(255),
   role VARCHAR(50) DEFAULT 'user',
   is_active BOOLEAN DEFAULT FALSE,
+  is_verified BOOLEAN DEFAULT FALSE,
+  verification_token VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

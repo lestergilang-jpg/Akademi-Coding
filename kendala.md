@@ -1,5 +1,10 @@
-ini saya punya kendala nih di project ini tolong dibantu analisa dong 
+saya ada sedikit kendala nih
 
-ketika saya test payment dan status payment sudah sukses course yang premium masih tetap terkunci nih user tetep belum bisa mengaskes course premium nya
+jadi projek ini sudah saya test dan memang sudah berjalan lancar, namun dari segi keamanan nya masih kurang nih
+setiap saya test membuat akun baru  dengan email ngasal pasti langsung bisa nih mau sembarang email nya akun tetep dibikin
 
-tolong cari penyebab nya, jangan langsung melakukan coding dulu tapi buat implementasi baru dulu terus beri tau aku dulu ya kendala nya ada dimana
+nah saya mau untuk setiap member yang register harus verif email nya nanti user ini dikirimi email verifikasi dan jika tidak verif email nya maka akun nya tidak bisa login
+
+tolong buatkan implementasi baru untuk mengatasi kendala seperti ini gimana ya? berikan saya pertanyaan jika ada yang perlu di klarifikasi juga
+
+
