@@ -16,7 +16,7 @@ const testimonials = [
   { name: 'Aldi Firmansyah', role: 'Fresh Graduate → Frontend Dev', avatar: 'AF', stars: 5, text: 'Gila banget, dari ga tau HTML sama sekali, sekarang udah kerja di startup Jaksel dengan gaji 8jt. Kurikulum di sini beneran step by step, ga loncat-loncat.' },
   { name: 'Sari Dewi', role: 'Ibu Rumah Tangga → Freelancer', avatar: 'SD', stars: 5, text: 'Belajar sambil ngurusin anak, alhamdulillah bisa. Sekarang freelance develop website UMKM, per project 3-5 jt. Worth banget investasinya!' },
   { name: 'Rizky Pratama', role: 'Karyawan Pabrik → Web Dev', avatar: 'RP', stars: 5, text: 'Gue kerja shift, belajar malam hari 1-2 jam. 6 bulan kemudian resign dan dapet kerja remote. Income naik 3x lipat dari sebelumnya.' },
-  { name: 'Maya Sari', role: 'Mahasiswa → Freelancer', avatar: 'MS', stars: 5, text: 'Semester 3 udah bisa dapet side income dari freelance. Temen-temen heran kok bisa. Rahasianya ya belajar di AkademiCoding!' },
+  { name: 'Maya Sari', role: 'Mahasiswa → Freelancer', avatar: 'MS', stars: 5, text: 'Semester 3 udah bisa dapet side income dari freelance. Temen-temen heran kok bisa. Rahasianya ya belajar di CumaNgeprompt!' },
   { name: 'Budi Santoso', role: 'Guru → Full Stack Dev', avatar: 'BS', stars: 5, text: 'Usia 35 belajar coding, banyak yang bilang udah telat. Buktinya sekarang jadi full stack developer. Umur bukan alasan!' },
   { name: 'Tika Amalia', role: 'Admin Toko → UI Developer', avatar: 'TA', stars: 5, text: 'Mentor supportnya TOP BGT. Tiap ada yang ga ngerti langsung dibantu. Ga pernah ngerasa sendirian belajarnya.' },
 ];
@@ -174,7 +174,7 @@ export default function LandingPage() {
                   <>
                     <div className="bg-[#1a1a2e] px-4 py-3 flex items-center gap-2 border-b border-white/5">
                       <div className="flex gap-1.5">{['#ff5f57','#febc2e','#28c840'].map(c => <div key={c} className="w-3 h-3 rounded-full" style={{ background: c }} />)}</div>
-                      <span className="text-slate-500 text-xs ml-2">dashboard.akademicoding.com</span>
+                      <span className="text-slate-500 text-xs ml-2">dashboard.cumangeprompt.com</span>
                     </div>
                     <div className="p-6">
                       <div className="grid grid-cols-3 gap-4 mb-6">
@@ -261,7 +261,7 @@ export default function LandingPage() {
               <span className="badge mb-4">💡 Solusi Kami</span>
               <h2 className="section-title mb-4">Belajar yang Beneran Bikin Bisa</h2>
               <p className="text-slate-400 leading-relaxed mb-6">
-                AkademiCoding bukan sekedar kursus biasa. Kami merancang <strong className="text-white">learning path yang terstruktur</strong> dari nol sampai bisa kerja, dengan pendekatan <strong className="text-white">project-based learning</strong> yang langsung praktek.
+                CumaNgeprompt bukan sekedar kursus biasa. Kami merancang <strong className="text-white">learning path yang terstruktur</strong> dari nol sampai bisa kerja, dengan pendekatan <strong className="text-white">project-based learning</strong> yang langsung praktek.
               </p>
               <div className="space-y-4">
                 {[

@@ -84,7 +84,7 @@ export default function RegisterPage() {
              <div className="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-xl text-left mb-8">
                <p className="text-yellow-400 text-xs font-bold mb-2 uppercase tracking-widest">💡 Panduan Cepat:</p>
                <ul className="text-slate-400 text-xs space-y-2">
-                 <li className="flex gap-2"><span>1.</span> Cari email dari <strong>Akademi Coding</strong></li>
+                 <li className="flex gap-2"><span>1.</span> Cari email dari <strong>Cuma Ngeprompt</strong></li>
                  <li className="flex gap-2"><span>2.</span> Cek folder <strong>Spam/Promosi</strong> jika tidak ada di Inbox</li>
                  <li className="flex gap-2"><span>3.</span> Klik tombol "Verifikasi Email Saya"</li>
                </ul>
@@ -120,7 +120,7 @@ export default function RegisterPage() {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center">
               <FiCode className="text-white" />
             </div>
-            Akademi<span className="text-gradient">Coding</span>
+            Cuma<span className="text-gradient">Ngeprompt</span>
           </Link>
           <h1 className="text-2xl font-bold text-white mt-6">Mulai Perjalananmu 🚀</h1>
           <p className="text-slate-400 mt-2">Daftar gratis dan mulai belajar coding hari ini</p>

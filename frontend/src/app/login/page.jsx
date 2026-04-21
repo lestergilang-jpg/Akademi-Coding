@@ -151,7 +151,7 @@ export default function LoginPage() {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center">
               <FiCode className="text-white" />
             </div>
-            Akademi<span className="text-gradient">Coding</span>
+            Cuma<span className="text-gradient">Ngeprompt</span>
           </Link>
           <h1 className="text-2xl font-bold text-white mt-6">Selamat Datang Kembali 👋</h1>
           <p className="text-slate-400 mt-2">Masuk ke akun kamu untuk lanjut belajar</p>
@@ -253,7 +253,7 @@ export default function LoginPage() {
 
         {/* Demo credentials */}
         <div className="mt-4 p-4 rounded-xl bg-white/3 border border-white/10 text-center">
-          <p className="text-slate-500 text-xs">Demo Admin: <span className="text-slate-400">admin@akademicoding.com</span> / <span className="text-slate-400">admin123</span></p>
+          <p className="text-slate-500 text-xs">Demo Admin: <span className="text-slate-400">admin@cumangeprompt.com</span> / <span className="text-slate-400">admin123</span></p>
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import { Toaster } from 'react-hot-toast';
 
 export const metadata = {
-  title: 'AkademiCoding – Belajar JavaScript dari Nol Sampai Expert',
+  title: 'CumaNgeprompt – Belajar AI Deskripsi dari Nol Sampai Expert',
   description: 'Bootcamp JavaScript online terbaik. Kuasai HTML, CSS, JavaScript, React, Node.js dan buat project nyata. Cocok untuk pemula, siap kerja & freelance.',
   keywords: 'belajar coding, javascript, web developer, bootcamp online, kursus programming',
 };

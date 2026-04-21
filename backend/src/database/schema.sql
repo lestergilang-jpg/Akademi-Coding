@@ -1,5 +1,5 @@
 -- ============================================
--- AkademiCoding Database Schema (PostgreSQL)
+-- CumaNgeprompt Database Schema (PostgreSQL)
 -- ============================================
 
 -- Users table
@@ -99,7 +99,7 @@ CREATE OR REPLACE TRIGGER update_transactions_modtime BEFORE UPDATE ON transacti
 
 -- Insert Admin if not exists
 INSERT INTO users (name, email, password, role, is_active) 
-VALUES ('Admin', 'admin@akademicoding.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu2', 'admin', TRUE)
+VALUES ('Admin', 'admin@cumangeprompt.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu2', 'admin', TRUE)
 ON CONFLICT (email) DO NOTHING;
 
 -- Insert Course if not exists

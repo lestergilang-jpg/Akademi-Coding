@@ -39,7 +39,7 @@ export default function ForgotPasswordPage() {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center">
               <FiCode className="text-white" />
             </div>
-            Akademi<span className="text-gradient">Coding</span>
+            Cuma<span className="text-gradient">Ngeprompt</span>
           </Link>
           <h1 className="text-2xl font-bold text-white mt-6">Lupa Password? 🔐</h1>
           <p className="text-slate-400 mt-2">Masukkan email kamu dan kami akan kirimkan link untuk membuat password baru.</p>

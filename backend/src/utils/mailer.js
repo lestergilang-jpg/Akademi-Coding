@@ -15,9 +15,9 @@ const sendVerificationEmail = async (toEmail, token) => {
   const verificationLink = `${backendUrl}/api/auth/verify-email?token=${token}`;
 
   const mailOptions = {
-    from: '"Akademi Coding" <noreply@akademicoding.com>',
+    from: '"Cuma Ngeprompt" <noreply@cumangeprompt.com>',
     to: toEmail,
-    subject: 'Verifikasi Akun Akademi Coding Anda',
+    subject: 'Verifikasi Akun Cuma Ngeprompt Anda',
     html: `
       <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;background:#0d0d1a;color:#e2e8f0;border-radius:12px;overflow:hidden;border:1px solid #ffffff10;">
         <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);padding:32px 24px;text-align:center;">
@@ -26,7 +26,7 @@ const sendVerificationEmail = async (toEmail, token) => {
         <div style="padding:32px 24px;">
           <p style="font-size:16px;line-height:1.6;">Halo,</p>
           <p style="font-size:14px;line-height:1.6;color:#94a3b8;">
-            Terima kasih telah mendaftar di <strong>Akademi Coding</strong>. Untuk mengaktifkan akun kamu dan mulai belajar, silakan klik tombol di bawah ini:
+            Terima kasih telah mendaftar di <strong>Cuma Ngeprompt</strong>. Untuk mengaktifkan akun kamu dan mulai belajar, silakan klik tombol di bawah ini:
           </p>
           <div style="text-align:center;margin:32px 0;">
             <a href="${verificationLink}" style="display:inline-block;padding:14px 32px;background:#6366f1;color:white;text-decoration:none;border-radius:12px;font-weight:bold;box-shadow:0 10px 15px -3px rgba(99,102,241,0.3);">Verifikasi Email Saya</a>
@@ -36,7 +36,7 @@ const sendVerificationEmail = async (toEmail, token) => {
             <a href="${verificationLink}" style="color:#6366f1;word-break:break-all;">${verificationLink}</a>
           </p>
           <hr style="border:none;border-top:1px solid #ffffff10;margin:24px 0;" />
-          <p style="color:#64748b;font-size:12px;text-align:center;">Salam hangat,<br/>Tim Akademi Coding</p>
+          <p style="color:#64748b;font-size:12px;text-align:center;">Salam hangat,<br/>Tim Cuma Ngeprompt</p>
         </div>
       </div>
     `
@@ -50,9 +50,9 @@ const sendPasswordResetEmail = async (toEmail, token) => {
   const resetLink = `${frontendUrl}/reset-password?token=${token}`;
 
   const mailOptions = {
-    from: '"Akademi Coding" <noreply@akademicoding.com>',
+    from: '"Cuma Ngeprompt" <noreply@cumangeprompt.com>',
     to: toEmail,
-    subject: 'Reset Password Akademi Coding Anda',
+    subject: 'Reset Password Cuma Ngeprompt Anda',
     html: `
       <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;background:#0d0d1a;color:#e2e8f0;border-radius:12px;overflow:hidden;border:1px solid #ffffff10;">
         <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);padding:32px 24px;text-align:center;">
@@ -61,16 +61,16 @@ const sendPasswordResetEmail = async (toEmail, token) => {
         <div style="padding:32px 24px;">
           <p style="font-size:16px;line-height:1.6;">Halo,</p>
           <p style="font-size:14px;line-height:1.6;color:#94a3b8;">
-            Kami menerima permintaan untuk mereset password akun <strong>Akademi Coding</strong> kamu. Klik tombol di bawah ini untuk mengatur ulang password:
+            Kami menerima permintaan untuk mereset password akun <strong>Cuma Ngeprompt</strong> kamu. Klik tombol di bawah ini untuk mengatur ulang password:
           </p>
           <div style="text-align:center;margin:32px 0;">
             <a href="${resetLink}" style="display:inline-block;padding:14px 32px;background:#6366f1;color:white;text-decoration:none;border-radius:12px;font-weight:bold;box-shadow:0 10px 15px -3px rgba(99,102,241,0.3);">Reset Password</a>
           </div>
-          <p style="color:#d1d5db;background:#ef444420;padding:12px;border-radius:8px;font-size:12px;border-left:3px solid #ef4444;">
+          <p style="color:#d1d5db;background:#ef444420;padding:12px;border-radius:8px;font-size:12px;border-left:3 solid #ef4444;">
             ⏰ Tautan ini hanya berlaku selama <strong>15 menit</strong>. Jika kamu tidak meminta ini, silakan abaikan email ini.
           </p>
           <hr style="border:none;border-top:1px solid #ffffff10;margin:24px 0;" />
-          <p style="color:#64748b;font-size:12px;text-align:center;">Salam hangat,<br/>Tim Akademi Coding</p>
+          <p style="color:#64748b;font-size:12px;text-align:center;">Salam hangat,<br/>Tim Cuma Ngeprompt</p>
         </div>
       </div>
     `
@@ -83,9 +83,9 @@ const sendInvoiceEmail = async (toEmail, userName, orderId, courseTitle, amount)
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
   
   const mailOptions = {
-    from: '"Akademi Coding" <noreply@akademicoding.com>',
+    from: '"Cuma Ngeprompt" <noreply@cumangeprompt.com>',
     to: toEmail,
-    subject: `Invoice Pembayaran - Akademi Coding [${orderId}]`,
+    subject: `Invoice Pembayaran - Cuma Ngeprompt [${orderId}]`,
     html: `
       <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;background:#0d0d1a;color:#e2e8f0;border-radius:12px;overflow:hidden;border:1px solid #ffffff10;">
         <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);padding:32px 24px;text-align:center;">
@@ -94,7 +94,7 @@ const sendInvoiceEmail = async (toEmail, userName, orderId, courseTitle, amount)
         <div style="padding:32px 24px;">
           <p style="font-size:16px;line-height:1.6;">Halo, <strong>${userName}</strong>!</p>
           <p style="font-size:14px;line-height:1.6;color:#94a3b8;">
-            Terima kasih telah memesan kursus di <strong>Akademi Coding</strong>. Berikut adalah rincian tagihan Anda:
+            Terima kasih telah memesan kursus di <strong>Cuma Ngeprompt</strong>. Berikut adalah rincian tagihan Anda:
           </p>
           
           <div style="background:#1e1e2e;padding:16px;border-radius:12px;margin:24px 0;border:1px solid #ffffff05;">
@@ -121,7 +121,7 @@ const sendInvoiceEmail = async (toEmail, userName, orderId, courseTitle, amount)
           </div>
           
           <hr style="border:none;border-top:1px solid #ffffff10;margin:24px 0;" />
-          <p style="color:#64748b;font-size:12px;text-align:center;">Salam hangat,<br/>Tim Akademi Coding</p>
+          <p style="color:#64748b;font-size:12px;text-align:center;">Salam hangat,<br/>Tim Cuma Ngeprompt</p>
         </div>
       </div>
     `
@@ -132,9 +132,9 @@ const sendInvoiceEmail = async (toEmail, userName, orderId, courseTitle, amount)
 
 const sendEmailChangeOTP = async (toEmail, otp, newEmail) => {
   const mailOptions = {
-    from: '"Akademi Coding" <noreply@akademicoding.com>',
+    from: '"Cuma Ngeprompt" <noreply@cumangeprompt.com>',
     to: toEmail,
-    subject: 'Kode OTP Verifikasi Ganti Email — Akademi Coding',
+    subject: 'Kode OTP Verifikasi Ganti Email — Cuma Ngeprompt',
     html: `
       <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;background:#0d0d1a;color:#e2e8f0;border-radius:12px;overflow:hidden;">
         <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);padding:32px 24px;text-align:center;">
@@ -142,7 +142,7 @@ const sendEmailChangeOTP = async (toEmail, otp, newEmail) => {
         </div>
         <div style="padding:32px 24px;">
           <p>Halo,</p>
-          <p>Kamu baru saja meminta untuk mengganti email akun <strong>Akademi Coding</strong> ke:</p>
+          <p>Kamu baru saja meminta untuk mengganti email akun <strong>Cuma Ngeprompt</strong> ke:</p>
           <p style="background:#1e1e2e;padding:12px 16px;border-radius:8px;border-left:4px solid #6366f1;font-weight:bold;color:#a5b4fc;">
             ${newEmail}
           </p>
@@ -155,7 +155,7 @@ const sendEmailChangeOTP = async (toEmail, otp, newEmail) => {
           <p style="color:#94a3b8;font-size:13px;">⏰ Kode ini hanya berlaku selama <strong style="color:#e2e8f0;">15 menit</strong>.</p>
           <p style="color:#94a3b8;font-size:13px;">⚠️ Jika kamu tidak meminta perubahan ini, abaikan email ini. Akun kamu tetap aman.</p>
           <hr style="border-color:#ffffff15;margin:24px 0;" />
-          <p style="color:#64748b;font-size:12px;text-align:center;">Salam hangat,<br/>Tim Akademi Coding</p>
+          <p style="color:#64748b;font-size:12px;text-align:center;">Salam hangat,<br/>Tim Cuma Ngeprompt</p>
         </div>
       </div>
     `
@@ -169,3 +169,4 @@ module.exports = {
   sendInvoiceEmail,
   sendEmailChangeOTP,
 };
+

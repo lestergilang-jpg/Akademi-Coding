@@ -11,7 +11,7 @@ export default function Footer() {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center">
                 <FiCode className="text-white text-sm" />
               </div>
-              Akademi<span className="text-gradient">Coding</span>
+              Cuma<span className="text-gradient">Ngeprompt</span>
             </Link>
             <p className="text-slate-400 text-sm max-w-xs leading-relaxed">
               Platform belajar coding terbaik untuk kamu yang ingin jadi web developer profesional dari nol.
@@ -42,7 +42,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="border-t border-white/10 mt-8 pt-6 text-center text-sm text-slate-500">
-          © {new Date().getFullYear()} AkademiCoding. All rights reserved. Made with ❤️ in Indonesia.
+          © {new Date().getFullYear()} CumaNgeprompt. All rights reserved. Made with ❤️ in Indonesia.
         </div>
       </div>
     </footer>

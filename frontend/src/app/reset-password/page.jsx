@@ -81,7 +81,7 @@ export default function ResetPasswordPage() {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center">
               <FiCode className="text-white" />
             </div>
-            Akademi<span className="text-gradient">Coding</span>
+            Cuma<span className="text-gradient">Ngeprompt</span>
           </Link>
           <h1 className="text-2xl font-bold text-white mt-6">Buat Password Baru 🛡️</h1>
           <p className="text-slate-400 mt-2">Buat password baru yang kuat untuk keamanan akunmu.</p>

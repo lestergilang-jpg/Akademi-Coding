@@ -1,5 +1,5 @@
 {
-  "name": "akademi-coding-backend",
+  "name": "cumangeprompt-backend",
   "version": "1.0.0",
   "description": "Backend API for AkademiCoding platform",
   "main": "src/index.js",

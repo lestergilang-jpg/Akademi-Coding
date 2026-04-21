@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { FiArrowLeft } from 'react-icons/fi';
 
 export const metadata = {
-  title: 'Syarat & Ketentuan - Akademi Coding',
-  description: 'Syarat, ketentuan, dan kebijakan privasi Akademi Coding.',
+  title: 'Syarat & Ketentuan - Cuma Ngeprompt',
+  description: 'Syarat, ketentuan, dan kebijakan privasi Cuma Ngeprompt.',
 };
 
 export default function TermsPage() {
@@ -30,7 +30,7 @@ export default function TermsPage() {
 
             <section>
               <h2 className="text-xl font-semibold text-white mb-2">3. Akses Subscription tahunan ke Modul E-Course</h2>
-              <p>Modul e-course yang disediakan oleh kami menawarkan akses subscription tahunan. Ini berarti Anda akan memiliki akses selama 1 tahun (12 bulan) ke konten e-course selama masa ketersediaan kursus beserta dengan update serta fasilitas terbaru, tanpa biaya tambahan. Akses ini tidak berlaku untuk produk atau layanan lainnya yang kami tawarkan. Jika akses subscription dihentikan di masa depan, tim Akademi CODING berhak menempatkan video di platform mana pun tanpa melanjutkan layanan purna jual.</p>
+              <p>Modul e-course yang disediakan oleh kami menawarkan akses subscription tahunan. Ini berarti Anda akan memiliki akses selama 1 tahun (12 bulan) ke konten e-course selama masa ketersediaan kursus beserta dengan update serta fasilitas terbaru, tanpa biaya tambahan. Akses ini tidak berlaku untuk produk atau layanan lainnya yang kami tawarkan. Jika akses subscription dihentikan di masa depan, tim Cuma Ngeprompt berhak menempatkan video di platform mana pun tanpa melanjutkan layanan purna jual.</p>
             </section>
 
             <section>
@@ -40,17 +40,17 @@ export default function TermsPage() {
 
             <section>
               <h2 className="text-xl font-semibold text-white mb-2">5. Kebijakan Penyesuaian Fasilitas, Produk, dan Layanan</h2>
-              <p>Akademi CODING berhak untuk mengubah, menambah, atau menghapus fasilitas, produk, dan layanan purna jual kapan saja tanpa pemberitahuan sebelumnya dan tanpa memerlukan persetujuan dari anggota.</p>
+              <p>Cuma Ngeprompt berhak untuk mengubah, menambah, atau menghapus fasilitas, produk, dan layanan purna jual kapan saja tanpa pemberitahuan sebelumnya dan tanpa memerlukan persetujuan dari anggota.</p>
             </section>
 
             <section>
               <h2 className="text-xl font-semibold text-white mb-2">6. Batasan Tanggung Jawab</h2>
-              <p>Tim Akademi CODING tidak bertanggung jawab atas kerugian, kerusakan, atau hasil negatif yang dialami member akibat tindakan melanggar hukum setelah mendapat informasi dan teknik di modul e-course kami. Anggota melepaskan pendiri dan tim Akademi CODING, serta Mudacumasekali, dari segala konsekuensi hukum dan tanggung jawab yang muncul dari konten yang dibuat dan diposting oleh anggota di media sosial. Semua konsekuensi tersebut sepenuhnya menjadi tanggung jawab anggota.</p>
+              <p>Tim Cuma Ngeprompt tidak bertanggung jawab atas kerugian, kerusakan, atau hasil negatif yang dialami member akibat tindakan melanggar hukum setelah mendapat informasi dan teknik di modul e-course kami. Anggota melepaskan pendiri dan tim Cuma Ngeprompt, serta Mudacumasekali, dari segala konsekuensi hukum dan tanggung jawab yang muncul dari konten yang dibuat dan diposting oleh anggota di media sosial. Semua konsekuensi tersebut sepenuhnya menjadi tanggung jawab anggota.</p>
             </section>
 
             <section>
               <h2 className="text-xl font-semibold text-white mb-2">7. Kebijakan Privasi</h2>
-              <p>Data Anda sepenuhnya aman dan tidak akan dijual kepada pihak ketiga. Data hanya akan digunakan untuk tujuan pemasaran oleh Akademi CODING, Mudacumasekali, dan mitra-mitranya.</p>
+              <p>Data Anda sepenuhnya aman dan tidak akan dijual kepada pihak ketiga. Data hanya akan digunakan untuk tujuan pemasaran oleh Cuma Ngeprompt, Mudacumasekali, dan mitra-mitranya.</p>
             </section>
 
             <section>
@@ -60,7 +60,7 @@ export default function TermsPage() {
 
             <section>
               <h2 className="text-xl font-semibold text-white mb-2">9. Perubahan pada Syarat dan Ketentuan</h2>
-              <p>Dengan menyetujui Syarat dan Ketentuan Akademi CODING, anggota menyetujui setiap modifikasi atau penambahan pada Syarat dan Ketentuan di masa depan tanpa memerlukan persetujuan lebih lanjut.</p>
+              <p>Dengan menyetujui Syarat dan Ketentuan Cuma Ngeprompt, anggota menyetujui setiap modifikasi atau penambahan pada Syarat dan Ketentuan di masa depan tanpa memerlukan persetujuan lebih lanjut.</p>
             </section>
 
           </div>
@@ -69,3 +69,4 @@ export default function TermsPage() {
     </div>
   );
 }
+

@@ -51,7 +51,7 @@ app.use('/api/settings', settingsRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ success: true, message: 'AkademiCoding API is running 🚀', time: new Date().toISOString() });
+  res.json({ success: true, message: 'CumaNgeprompt API is running 🚀', time: new Date().toISOString() });
 });
 
 // 404 handler
@@ -69,7 +69,7 @@ app.use((err, req, res, next) => {
 async function start() {
   await testConnection();
   app.listen(PORT, () => {
-    console.log(`\n🚀 AkademiCoding API running on http://localhost:${PORT}`);
+    console.log(`\n🚀 CumaNgeprompt API running on http://localhost:${PORT}`);
     console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}\n`);
   });
 }

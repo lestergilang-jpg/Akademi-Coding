@@ -1,0 +1,1 @@
+saya mau merombak total semua nama "akademi coding" menjadi "Cuma Ngeprompt" tolong bantu saya merubah semua namanya menjadi itu ya, buatkan fix-rebranding.md dan berikan saya pertanyaan jika ada yang perlu diklarifikasi
