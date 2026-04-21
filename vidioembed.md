@@ -1,0 +1,3 @@
+sekarang punya masalah kecil nih di vidio embed dari youtube nya masih menampilkan controller, seperti share link dan lain lain, tolong di perbaiki ya, saya hanya mau users hanya bisa setting kualitas vidio dan pause atau sliding mencepatkan durasi aja, untuk tombol share link dan lain lain tolong dihilangkan, dan juga saya mau vidio nya tidak bisa di download, fitur rekomendasi seperti more videos dan watch in youtube juga dihilangkan aja, pokoknya saya mau supaya konten vidio nya tidak bisa di akses selain di platform saya dan gabisa dibajak oleh users, tolong di perbaiki ya, buat implementasi baru di fix-vidioembed.md
+
+berikan saya pertanyaan untuk klarifikasi dulu jangan langsung ngoding

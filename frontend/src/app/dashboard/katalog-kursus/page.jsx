@@ -88,9 +88,19 @@ export default function KatalogKursusPage() {
             return (
               <div key={c.id} className="glass-card flex flex-col overflow-hidden hover:border-brand-500/30 transition-all duration-300 group">
                 {/* Thumbnail */}
-                <div className="h-44 bg-gradient-to-br from-brand-600/30 to-accent-600/30 flex items-center justify-center relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-brand-900/40 to-accent-900/40" />
-                  <FiBook size={52} className="text-white/30 relative z-10 group-hover:scale-110 transition-transform duration-300" />
+                <div className="h-44 bg-slate-800 flex items-center justify-center relative overflow-hidden">
+                  {c.thumbnail ? (
+                    <img
+                      src={c.thumbnail}
+                      alt={c.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                  ) : (
+                    <>
+                      <div className="absolute inset-0 bg-gradient-to-br from-brand-900/40 to-accent-900/40" />
+                      <FiBook size={52} className="text-white/30 relative z-10 group-hover:scale-110 transition-transform duration-300" />
+                    </>
+                  )}
                   {hasAccess && (
                     <span className="absolute top-3 right-3 bg-green-500/20 border border-green-500/30 text-green-400 text-xs px-2 py-1 rounded-full font-medium z-10">
                       ✓ Sudah Beli

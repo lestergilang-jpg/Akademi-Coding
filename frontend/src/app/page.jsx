@@ -1,8 +1,9 @@
 'use client';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import api from '@/lib/api';
 import {
   FiArrowRight, FiStar, FiCheck, FiLock, FiPlay,
   FiZap, FiBriefcase, FiUsers, FiAward, FiChevronDown,
@@ -80,6 +81,23 @@ function FAQItem({ q, a }) {
 // ─── MAIN PAGE ────────────────────────────────────────────────────────────────
 
 export default function LandingPage() {
+  const [landingData, setLandingData] = useState(null);
+
+  useEffect(() => {
+    api.get('/settings/landing_page')
+      .then(({ data }) => {
+        if (data.data) setLandingData(data.data);
+      })
+      .catch(() => console.log('Using default landing page data'));
+  }, []);
+
+  const heroData = landingData?.hero || {
+    title: 'Dari Nol Jadi Web Developer Dalam 4 Bulan',
+    subtitle: 'Kuasai JavaScript Full-Stack dan dapatkan skill yang dicari perusahaan tech. Cocok untuk pemula, siap kerja & freelance. Belajar sambil praktek project nyata.',
+    video_url: '',
+    image_url: ''
+  };
+
   return (
     <div className="min-h-screen bg-[#0a0a0f] overflow-x-hidden">
       <Navbar />
@@ -97,14 +115,18 @@ export default function LandingPage() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-300 text-sm font-medium mb-8 animate-fade-in">
             <FiZap className="text-yellow-400" size={14} />
-            🔥 Pendaftaran Batch 7 — Slot terbatas 50 orang!
+            🔥 {landingData?.registration_status || 'Pendaftaran Batch 7 — Slot terbatas 50 orang!'}
           </div>
 
           {/* Headline */}
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-black text-white leading-tight mb-6 animate-fade-up">
-            Dari Nol Jadi{' '}
-            <span className="text-gradient">Web Developer</span>
-            <br />Dalam 4 Bulan
+            {heroData.title.split('Web Developer').length > 1 ? (
+              <>
+                {heroData.title.split('Web Developer')[0]}
+                <span className="text-gradient">Web Developer</span>
+                {heroData.title.split('Web Developer')[1]}
+              </>
+            ) : heroData.title}
           </h1>
 
           {/* Subheadline */}
@@ -133,31 +155,46 @@ export default function LandingPage() {
             ))}
           </div>
 
-          {/* Dashboard mockup */}
+          {/* Hero Media (Video / Image / Mockup) */}
           <div className="mt-16 relative max-w-4xl mx-auto animate-float">
-            <div className="glass-card p-4 rounded-2xl glow">
-              <div className="bg-[#13131f] rounded-xl overflow-hidden">
-                <div className="bg-[#1a1a2e] px-4 py-3 flex items-center gap-2 border-b border-white/5">
-                  <div className="flex gap-1.5">{['#ff5f57','#febc2e','#28c840'].map(c => <div key={c} className="w-3 h-3 rounded-full" style={{ background: c }} />)}</div>
-                  <span className="text-slate-500 text-xs ml-2">dashboard.akademicoding.com</span>
-                </div>
-                <div className="p-6">
-                  <div className="grid grid-cols-3 gap-4 mb-6">
-                    {[['Materi Selesai','8/16','text-brand-400'],['Streak Belajar','12 Hari','text-yellow-400'],['Progress','50%','text-green-400']].map(([l,v,c]) => (
-                      <div key={l} className="bg-white/5 rounded-xl p-4 text-center">
-                        <div className={`text-2xl font-bold ${c}`}>{v}</div>
-                        <div className="text-slate-500 text-xs mt-1">{l}</div>
-                      </div>
-                    ))}
+            <div className="glass-card p-4 rounded-2xl glow bg-white/5 border border-white/10">
+              <div className="bg-[#13131f] rounded-xl overflow-hidden shadow-2xl">
+                {heroData.video_url ? (
+                  <div className="aspect-video w-full">
+                    <iframe 
+                      src={heroData.video_url} 
+                      className="w-full h-full border-0" 
+                      allowFullScreen 
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    />
                   </div>
-                  <div className="space-y-2">
-                    {['HTML & CSS Fundamentals ✅','JavaScript Core ✅','React.js 🔓','Backend Node.js 🔒','Project Real-World 🔒'].map((item, i) => (
-                      <div key={i} className={`flex items-center gap-3 p-3 rounded-lg text-sm ${i < 2 ? 'bg-brand-500/10 text-brand-300' : i === 2 ? 'bg-white/5 text-white' : 'bg-white/3 text-slate-600'}`}>
-                        <FiPlay size={12} /> {item}
+                ) : heroData.image_url ? (
+                  <img src={heroData.image_url} alt="Hero" className="w-full h-auto object-cover max-h-[500px]" />
+                ) : (
+                  <>
+                    <div className="bg-[#1a1a2e] px-4 py-3 flex items-center gap-2 border-b border-white/5">
+                      <div className="flex gap-1.5">{['#ff5f57','#febc2e','#28c840'].map(c => <div key={c} className="w-3 h-3 rounded-full" style={{ background: c }} />)}</div>
+                      <span className="text-slate-500 text-xs ml-2">dashboard.akademicoding.com</span>
+                    </div>
+                    <div className="p-6">
+                      <div className="grid grid-cols-3 gap-4 mb-6">
+                        {[['Materi Selesai','8/16','text-brand-400'],['Streak Belajar','12 Hari','text-yellow-400'],['Progress','50%','text-green-400']].map(([l,v,c]) => (
+                          <div key={l} className="bg-white/5 rounded-xl p-4 text-center">
+                            <div className={`text-2xl font-bold ${c}`}>{v}</div>
+                            <div className="text-slate-500 text-xs mt-1">{l}</div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </div>
+                      <div className="space-y-2 text-left">
+                        {['HTML & CSS Fundamentals ✅','JavaScript Core ✅','React.js 🔓','Backend Node.js 🔒','Project Real-World 🔒'].map((item, i) => (
+                          <div key={i} className={`flex items-center gap-3 p-3 rounded-lg text-sm ${i < 2 ? 'bg-brand-500/10 text-brand-300' : i === 2 ? 'bg-white/5 text-white' : 'bg-white/3 text-slate-600'}`}>
+                            <FiPlay size={12} /> {item}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

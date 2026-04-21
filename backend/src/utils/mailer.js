@@ -19,13 +19,26 @@ const sendVerificationEmail = async (toEmail, token) => {
     to: toEmail,
     subject: 'Verifikasi Akun Akademi Coding Anda',
     html: `
-      <h2>Selamat Datang di Akademi Coding!</h2>
-      <p>Terima kasih telah mendaftar. Untuk mulai belajar dan bisa login, silakan verifikasi alamat email Anda dengan menekan tombol/tautan di bawah ini:</p>
-      <a href="${verificationLink}" style="display:inline-block; padding:10px 20px; background-color:#5865F2; color:white; text-decoration:none; border-radius:5px;">Verifikasi Email Saya</a>
-      <br/><br/>
-      <p>Atau copy & paste tautan ini ke browser Anda: <br/> <a href="${verificationLink}">${verificationLink}</a></p>
-      <br/>
-      <p>Salam hangat,<br/>Tim Akademi Coding</p>
+      <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;background:#0d0d1a;color:#e2e8f0;border-radius:12px;overflow:hidden;border:1px solid #ffffff10;">
+        <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);padding:32px 24px;text-align:center;">
+          <h1 style="color:white;margin:0;font-size:22px;">🎉 Selamat Datang!</h1>
+        </div>
+        <div style="padding:32px 24px;">
+          <p style="font-size:16px;line-height:1.6;">Halo,</p>
+          <p style="font-size:14px;line-height:1.6;color:#94a3b8;">
+            Terima kasih telah mendaftar di <strong>Akademi Coding</strong>. Untuk mengaktifkan akun kamu dan mulai belajar, silakan klik tombol di bawah ini:
+          </p>
+          <div style="text-align:center;margin:32px 0;">
+            <a href="${verificationLink}" style="display:inline-block;padding:14px 32px;background:#6366f1;color:white;text-decoration:none;border-radius:12px;font-weight:bold;box-shadow:0 10px 15px -3px rgba(99,102,241,0.3);">Verifikasi Email Saya</a>
+          </div>
+          <p style="color:#94a3b8;font-size:12px;text-align:center;">
+            Atau klik link ini jika tombol tidak berfungsi:<br/>
+            <a href="${verificationLink}" style="color:#6366f1;word-break:break-all;">${verificationLink}</a>
+          </p>
+          <hr style="border:none;border-top:1px solid #ffffff10;margin:24px 0;" />
+          <p style="color:#64748b;font-size:12px;text-align:center;">Salam hangat,<br/>Tim Akademi Coding</p>
+        </div>
+      </div>
     `
   };
 
@@ -41,13 +54,25 @@ const sendPasswordResetEmail = async (toEmail, token) => {
     to: toEmail,
     subject: 'Reset Password Akademi Coding Anda',
     html: `
-      <h2>Permintaan Reset Password</h2>
-      <p>Anda baru saja meminta untuk mereset password akun Akademi Coding Anda.</p>
-      <p>Klik tombol di bawah ini untuk mengatur ulang password Anda. Tautan ini hanya berlaku selama 15 menit.</p>
-      <a href="${resetLink}" style="display:inline-block; padding:10px 20px; background-color:#5865F2; color:white; text-decoration:none; border-radius:5px;">Reset Password</a>
-      <br/><br/>
-      <p>Jika Anda tidak meminta reset password, abaikan saja email ini.</p>
-      <p>Salam hangat,<br/>Tim Akademi Coding</p>
+      <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;background:#0d0d1a;color:#e2e8f0;border-radius:12px;overflow:hidden;border:1px solid #ffffff10;">
+        <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);padding:32px 24px;text-align:center;">
+          <h1 style="color:white;margin:0;font-size:22px;">🔑 Reset Password</h1>
+        </div>
+        <div style="padding:32px 24px;">
+          <p style="font-size:16px;line-height:1.6;">Halo,</p>
+          <p style="font-size:14px;line-height:1.6;color:#94a3b8;">
+            Kami menerima permintaan untuk mereset password akun <strong>Akademi Coding</strong> kamu. Klik tombol di bawah ini untuk mengatur ulang password:
+          </p>
+          <div style="text-align:center;margin:32px 0;">
+            <a href="${resetLink}" style="display:inline-block;padding:14px 32px;background:#6366f1;color:white;text-decoration:none;border-radius:12px;font-weight:bold;box-shadow:0 10px 15px -3px rgba(99,102,241,0.3);">Reset Password</a>
+          </div>
+          <p style="color:#d1d5db;background:#ef444420;padding:12px;border-radius:8px;font-size:12px;border-left:3px solid #ef4444;">
+            ⏰ Tautan ini hanya berlaku selama <strong>15 menit</strong>. Jika kamu tidak meminta ini, silakan abaikan email ini.
+          </p>
+          <hr style="border:none;border-top:1px solid #ffffff10;margin:24px 0;" />
+          <p style="color:#64748b;font-size:12px;text-align:center;">Salam hangat,<br/>Tim Akademi Coding</p>
+        </div>
+      </div>
     `
   };
 
@@ -62,19 +87,43 @@ const sendInvoiceEmail = async (toEmail, userName, orderId, courseTitle, amount)
     to: toEmail,
     subject: `Invoice Pembayaran - Akademi Coding [${orderId}]`,
     html: `
-      <h2>Halo, ${userName}!</h2>
-      <p>Terima kasih telah memesan kursus di Akademi Coding. Berikut adalah rincian tagihan Anda:</p>
-      <ul>
-        <li><strong>Order ID:</strong> ${orderId}</li>
-        <li><strong>Kursus:</strong> ${courseTitle}</li>
-        <li><strong>Total Tagihan:</strong> Rp ${parseInt(amount).toLocaleString('id-ID')}</li>
-      </ul>
-      <p>Status pembayaran Anda saat ini adalah <strong>Pending</strong>.</p>
-      <p>Untuk melanjutkan pembayaran, silakan masuk ke dashboard akun Anda, lalu menuju ke bagian "Riwayat Transaksi" dan klik tombol "Lanjutkan Pembayaran".</p>
-      <a href="${frontendUrl}/dashboard" style="display:inline-block; padding:10px 20px; background-color:#5865F2; color:white; text-decoration:none; border-radius:5px;">Ke Dashboard</a>
-      <br/><br/>
-      <p>Jika Anda sudah melakukan pembayaran, silakan abaikan email ini.</p>
-      <p>Salam hangat,<br/>Tim Akademi Coding</p>
+      <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;background:#0d0d1a;color:#e2e8f0;border-radius:12px;overflow:hidden;border:1px solid #ffffff10;">
+        <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);padding:32px 24px;text-align:center;">
+          <h1 style="color:white;margin:0;font-size:22px;">🧾 Invoice Pembayaran</h1>
+        </div>
+        <div style="padding:32px 24px;">
+          <p style="font-size:16px;line-height:1.6;">Halo, <strong>${userName}</strong>!</p>
+          <p style="font-size:14px;line-height:1.6;color:#94a3b8;">
+            Terima kasih telah memesan kursus di <strong>Akademi Coding</strong>. Berikut adalah rincian tagihan Anda:
+          </p>
+          
+          <div style="background:#1e1e2e;padding:16px;border-radius:12px;margin:24px 0;border:1px solid #ffffff05;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+               <span style="color:#64748b;font-size:12px;">Order ID:</span>
+               <span style="color:#e2e8f0;font-size:12px;font-family:monospace;">${orderId}</span>
+            </div>
+            <div style="margin-bottom:8px;">
+               <span style="color:#64748b;font-size:12px;">Kursus:</span><br/>
+               <span style="color:#e2e8f0;font-size:14px;font-weight:bold;">${courseTitle}</span>
+            </div>
+            <div style="padding-top:12px;border-top:1px solid #ffffff05;margin-top:12px;display:flex;justify-content:space-between;align-items:center;">
+               <span style="color:#64748b;font-size:12px;">Total Bayar:</span>
+               <span style="color:#10b981;font-size:18px;font-weight:900;">Rp ${parseInt(amount).toLocaleString('id-ID')}</span>
+            </div>
+          </div>
+
+          <p style="font-size:13px;color:#94a3b8;text-align:center;margin-bottom:24px;">
+            Status: <span style="color:#f59e0b;font-weight:bold;">PENDING</span>
+          </p>
+
+          <div style="text-align:center;margin:32px 0;">
+            <a href="${frontendUrl}/dashboard" style="display:inline-block;padding:14px 32px;background:#6366f1;color:white;text-decoration:none;border-radius:12px;font-weight:bold;box-shadow:0 10px 15px -3px rgba(99,102,241,0.3);">Selesaikan Pembayaran</a>
+          </div>
+          
+          <hr style="border:none;border-top:1px solid #ffffff10;margin:24px 0;" />
+          <p style="color:#64748b;font-size:12px;text-align:center;">Salam hangat,<br/>Tim Akademi Coding</p>
+        </div>
+      </div>
     `
   };
 

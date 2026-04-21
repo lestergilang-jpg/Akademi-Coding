@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {
   register, login, getMe, updateProfile, updateAvatar, verifyEmail,
-  forgotPassword, resetPassword,
+  forgotPassword, resetPassword, resendVerification,
   changePassword, requestEmailChange, verifyEmailChange,
 } = require('../controllers/authController');
 const { linkDiscord, discordCallback } = require('../controllers/discordController');
@@ -27,5 +27,6 @@ router.post('/verify-email-change', protect, verifyEmailChange);
 router.get('/discord/link', linkDiscord);
 router.get('/discord/callback', discordCallback);
 router.get('/verify-email', verifyEmail);
+router.post('/resend-verification', resendVerification);
 
 module.exports = router;

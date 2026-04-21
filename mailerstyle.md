@@ -1,0 +1,1 @@
+didalam mailer.js saya masih melihat tampilan HTML yang kurang bagus nih hanya satu aja yang bagus dibagian Kode OTP Verifikasi Ganti Email — Akademi Coding, tolong yang lain dibuat seperti itu juga ya, buatkan implementasi baru di fix-mailerstyle.md

@@ -213,6 +213,28 @@ const verifyEmail = async (req, res) => {
   }
 };
 
+// POST /api/auth/resend-verification
+const resendVerification = async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ success: false, message: 'Email wajib diisi.' });
+
+  try {
+    const { rows } = await pool.query('SELECT id, verification_token, is_verified FROM users WHERE email = $1', [email]);
+    if (!rows.length) {
+      return res.status(404).json({ success: false, message: 'Email tidak ditemukan.' });
+    }
+    if (rows[0].is_verified) {
+      return res.status(400).json({ success: false, message: 'Akun sudah terverifikasi. Silakan login.' });
+    }
+
+    await sendVerificationEmail(email, rows[0].verification_token);
+    res.json({ success: true, message: 'Email verifikasi telah dikirim ulang.' });
+  } catch (error) {
+    console.error('Resend verification error:', error);
+    res.status(500).json({ success: false, message: 'Gagal mengirim ulang email.' });
+  }
+};
+
 // POST /api/auth/forgot-password
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
@@ -411,5 +433,6 @@ const verifyEmailChange = async (req, res) => {
 module.exports = {
   register, login, getMe, updateProfile, updateAvatar, verifyEmail,
   forgotPassword, resetPassword,
+  resendVerification,
   changePassword, requestEmailChange, verifyEmailChange,
 };

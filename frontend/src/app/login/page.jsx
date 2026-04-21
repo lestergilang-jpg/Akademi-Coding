@@ -38,6 +38,7 @@ export default function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isShaking, setIsShaking] = useState(false);
 
   // Inline alert (lebih persisten dari toast)
   const [alert, setAlert] = useState(null); // { type: 'error'|'success'|'warning', message: '' }
@@ -122,6 +123,12 @@ export default function LoginPage() {
     } catch (err) {
       const alertData = getErrorMessage(err);
       setAlert(alertData);
+      
+      // Trigger shake animation for errors
+      if (alertData.type === 'error') {
+        setIsShaking(true);
+        setTimeout(() => setIsShaking(false), 500);
+      }
     } finally {
       setLoading(false);
     }
@@ -151,7 +158,7 @@ export default function LoginPage() {
         </div>
 
         {/* Card */}
-        <div className="glass-card p-8">
+        <div className={`glass-card p-8 ${isShaking ? 'animate-shake' : ''}`}>
           {/* Alert area — muncul di atas form */}
           {alert && (
             <div className="mb-5">
@@ -176,7 +183,7 @@ export default function LoginPage() {
                   type="email"
                   placeholder="kamu@email.com"
                   value={form.email}
-                  onChange={e => setAlert(null) || setForm({ ...form, email: e.target.value })}
+                  onChange={e => setForm({ ...form, email: e.target.value })}
                   className={`input-field pl-10 ${alert?.type === 'error' ? 'border-red-500/50 focus:border-red-500' : ''}`}
                   disabled={isBlocked}
                   required
@@ -193,7 +200,7 @@ export default function LoginPage() {
                   type={showPass ? 'text' : 'password'}
                   placeholder="••••••••"
                   value={form.password}
-                  onChange={e => setAlert(null) || setForm({ ...form, password: e.target.value })}
+                  onChange={e => setForm({ ...form, password: e.target.value })}
                   className={`input-field pl-10 pr-10 ${alert?.type === 'error' ? 'border-red-500/50 focus:border-red-500' : ''}`}
                   disabled={isBlocked}
                   required

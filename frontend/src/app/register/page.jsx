@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import api from '@/lib/api';
 import toast from 'react-hot-toast';
 import { FiUser, FiMail, FiLock, FiCode, FiEye, FiEyeOff, FiArrowRight, FiCheck, FiPhone, FiTag } from 'react-icons/fi';
 
@@ -13,6 +14,8 @@ export default function RegisterPage() {
   const [showPass, setShowPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isRegistered, setIsRegistered] = useState(false);
+  const [resending, setResending] = useState(false);
 
   const passwordStrength = (pass) => {
     let score = 0;
@@ -35,8 +38,7 @@ export default function RegisterPage() {
     try {
       const res = await register(form.name, form.email, form.password, form.whatsapp_number, form.promo_code);
       if (res?.requireVerification) {
-        toast.success('Cek Email Anda! Link verifikasi telah dikirim.', { duration: 6000 });
-        router.push('/login?registered=true');
+        setIsRegistered(true);
       } else {
         toast.success('Akun berhasil dibuat! 🎉');
         router.push('/dashboard');
@@ -47,6 +49,63 @@ export default function RegisterPage() {
       setLoading(false);
     }
   };
+
+  const handleResend = async () => {
+    setResending(true);
+    try {
+      await api.post('/auth/resend-verification', { email: form.email });
+      toast.success('Email verifikasi telah dikirim ulang!');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Gagal mengirim ulang email.');
+    } finally {
+      setResending(false);
+    }
+  };
+
+  if (isRegistered) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/4 right-1/4 w-72 h-72 bg-brand-600/15 rounded-full blur-[100px]" />
+          <div className="absolute bottom-1/4 left-1/4 w-72 h-72 bg-accent-500/15 rounded-full blur-[100px]" />
+        </div>
+
+        <div className="w-full max-w-md relative z-10 text-center">
+          <div className="glass-card p-10 flex flex-col items-center">
+             <div className="w-20 h-20 bg-brand-500/20 rounded-full flex items-center justify-center mb-6 border border-brand-500/30">
+               <FiMail size={40} className="text-brand-400" />
+             </div>
+             <h1 className="text-2xl font-black text-white mb-4">Cek Email Kamu Sekarang!</h1>
+             <p className="text-slate-400 mb-6 leading-relaxed">
+               Link verifikasi telah dikirim ke <br/>
+               <span className="text-white font-bold">{form.email}</span>
+             </p>
+             
+             <div className="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-xl text-left mb-8">
+               <p className="text-yellow-400 text-xs font-bold mb-2 uppercase tracking-widest">💡 Panduan Cepat:</p>
+               <ul className="text-slate-400 text-xs space-y-2">
+                 <li className="flex gap-2"><span>1.</span> Cari email dari <strong>Akademi Coding</strong></li>
+                 <li className="flex gap-2"><span>2.</span> Cek folder <strong>Spam/Promosi</strong> jika tidak ada di Inbox</li>
+                 <li className="flex gap-2"><span>3.</span> Klik tombol "Verifikasi Email Saya"</li>
+               </ul>
+             </div>
+
+             <button 
+               onClick={handleResend}
+               disabled={resending}
+               className="text-brand-400 hover:text-brand-300 font-bold text-sm underline flex items-center gap-2 disabled:opacity-50"
+             >
+               {resending ? 'Sabar ya, sedang kirim...' : 'Belum dapat email? Kirim ulang'}
+             </button>
+
+             <Link href="/login" className="btn-outline mt-8 w-full justify-center">
+               Kembali ke Login
+             </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4 relative overflow-hidden">

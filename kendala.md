@@ -1,10 +1,5 @@
-saya ada sedikit kendala nih
+ini ada kendala lagi
 
-jadi projek ini sudah saya test dan memang sudah berjalan lancar, namun dari segi keamanan nya masih kurang nih
-setiap saya test membuat akun baru  dengan email ngasal pasti langsung bisa nih mau sembarang email nya akun tetep dibikin
+jadi setiap kita bikin course baru dan user pay salah satu course nya dan sudah berhasil pembayaran nah disini semua course nya langsung ke unlock semua padahal kan harus nya course yang baru dibeli itu yang ke unlock
 
-nah saya mau untuk setiap member yang register harus verif email nya nanti user ini dikirimi email verifikasi dan jika tidak verif email nya maka akun nya tidak bisa login
-
-tolong buatkan implementasi baru untuk mengatasi kendala seperti ini gimana ya? berikan saya pertanyaan jika ada yang perlu di klarifikasi juga
-
-
+aku mau kamu menganilasa ini dan beritau saya penyebab nya apa dan gimana solusi nya, tulis di file kendala-course.md
