@@ -27,9 +27,18 @@ export default function KatalogKursusPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
+  const [myCourseIds, setMyCourseIds] = useState([]);
+
   useEffect(() => {
-    api.get('/courses')
-      .then(({ data }) => setAllCourses(data.data || []))
+    Promise.all([
+      api.get('/courses'),
+      api.get('/courses/my').catch(() => ({ data: { data: [] } }))
+    ])
+      .then(([coursesRes, myCoursesRes]) => {
+        setAllCourses(coursesRes.data.data || []);
+        const myCourses = myCoursesRes.data?.data || [];
+        setMyCourseIds(myCourses.map(c => c.id));
+      })
       .catch(() => toast.error('Gagal memuat katalog kursus.'))
       .finally(() => setLoading(false));
   }, []);
@@ -75,7 +84,7 @@ export default function KatalogKursusPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filtered.map(c => {
-            const hasAccess = user?.is_active;
+            const hasAccess = myCourseIds.includes(c.id);
             return (
               <div key={c.id} className="glass-card flex flex-col overflow-hidden hover:border-brand-500/30 transition-all duration-300 group">
                 {/* Thumbnail */}

@@ -42,7 +42,8 @@ const getCourse = async (req, res) => {
 
     let isActive = false;
     if (req.user) {
-      if (req.user.is_active) isActive = true;
+      // Backward compatibility: is_active user flag hanya berlaku untuk course ID 1
+      if (req.user.is_active && req.params.id == 1) isActive = true;
       const { rows: uc } = await pool.query('SELECT status FROM user_courses WHERE user_id = $1 AND course_id = $2', [req.user.id, req.params.id]);
       if (uc.length && uc[0].status === 'active') isActive = true;
     }
@@ -69,7 +70,8 @@ const getLesson = async (req, res) => {
     const lesson = lessons[0];
     
     let isActive = false;
-    if (req.user.is_active) isActive = true;
+    // Backward compatibility: is_active user flag hanya berlaku untuk course ID 1
+    if (req.user.is_active && lesson.course_id == 1) isActive = true;
     const { rows: uc } = await pool.query('SELECT status FROM user_courses WHERE user_id = $1 AND course_id = $2', [req.user.id, lesson.course_id]);
     if (uc.length && uc[0].status === 'active') isActive = true;
 
