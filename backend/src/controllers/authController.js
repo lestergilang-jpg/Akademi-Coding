@@ -10,10 +10,10 @@ const generateToken = (id) => {
 
 // POST /api/auth/register
 const register = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, whatsapp_number, promo_code } = req.body;
 
-  if (!name || !email || !password) {
-    return res.status(400).json({ success: false, message: 'Nama, email, dan password wajib diisi.' });
+  if (!name || !email || !password || !whatsapp_number) {
+    return res.status(400).json({ success: false, message: 'Nama, email, password, dan nomor WhatsApp wajib diisi.' });
   }
   if (password.length < 8) {
     return res.status(400).json({ success: false, message: 'Password minimal 8 karakter.' });
@@ -29,8 +29,8 @@ const register = async (req, res) => {
     const verificationToken = uuidv4();
 
     const { rows: result } = await pool.query(
-      'INSERT INTO users (name, email, password, is_verified, verification_token) VALUES ($1, $2, $3, $4, $5) RETURNING id',
-      [name, email, hashedPassword, false, verificationToken]
+      'INSERT INTO users (name, email, password, whatsapp_number, promo_code, is_verified, verification_token) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
+      [name, email, hashedPassword, whatsapp_number, promo_code || null, false, verificationToken]
     );
 
     const adminEmails = (process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase());
@@ -83,13 +83,13 @@ const login = async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     if (!rows.length) {
-      return res.status(401).json({ success: false, message: 'Email atau password salah.' });
+      return res.status(404).json({ success: false, message: 'Email ini belum terdaftar.' });
     }
 
     const user = rows[0];
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ success: false, message: 'Email atau password salah.' });
+      return res.status(401).json({ success: false, message: 'Password yang Anda masukkan salah.' });
     }
 
     // Check .env for auto-admin (also auto-verifies them)
@@ -271,4 +271,145 @@ const resetPassword = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getMe, updateProfile, updateAvatar, verifyEmail, forgotPassword, resetPassword };
+// POST /api/auth/change-password
+const changePassword = async (req, res) => {
+  const { currentPassword, newPassword, confirmPassword } = req.body;
+  const userId = req.user.id;
+
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    return res.status(400).json({ success: false, message: 'Semua kolom password wajib diisi.' });
+  }
+  if (newPassword.length < 8) {
+    return res.status(400).json({ success: false, message: 'Password baru minimal 8 karakter.' });
+  }
+  if (newPassword !== confirmPassword) {
+    return res.status(400).json({ success: false, message: 'Konfirmasi password tidak cocok.' });
+  }
+
+  try {
+    const { rows } = await pool.query('SELECT password FROM users WHERE id = $1', [userId]);
+    const isMatch = await bcrypt.compare(currentPassword, rows[0].password);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, message: 'Password saat ini yang Anda masukkan salah.' });
+    }
+    if (await bcrypt.compare(newPassword, rows[0].password)) {
+      return res.status(400).json({ success: false, message: 'Password baru tidak boleh sama dengan password saat ini.' });
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    await pool.query('UPDATE users SET password = $1 WHERE id = $2', [hashed, userId]);
+
+    res.json({ success: true, message: 'Password berhasil diperbarui. Silakan login kembali jika diperlukan.' });
+  } catch (error) {
+    console.error('Change password error:', error);
+    res.status(500).json({ success: false, message: 'Terjadi kesalahan server.' });
+  }
+};
+
+// POST /api/auth/request-email-change
+// Kirim OTP 6-digit ke email LAMA untuk verifikasi sebelum ganti email
+const requestEmailChange = async (req, res) => {
+  const { newEmail } = req.body;
+  const userId = req.user.id;
+
+  if (!newEmail) {
+    return res.status(400).json({ success: false, message: 'Email baru wajib diisi.' });
+  }
+
+  // Cek format email dasar
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(newEmail)) {
+    return res.status(400).json({ success: false, message: 'Format email tidak valid.' });
+  }
+
+  try {
+    // Pastikan email baru belum dipakai pengguna lain
+    const { rows: existing } = await pool.query(
+      'SELECT id FROM users WHERE email = $1 AND id != $2',
+      [newEmail, userId]
+    );
+    if (existing.length) {
+      return res.status(409).json({ success: false, message: 'Email ini sudah digunakan oleh akun lain.' });
+    }
+
+    // Pastikan email baru tidak sama dengan email saat ini
+    const { rows: current } = await pool.query('SELECT email FROM users WHERE id = $1', [userId]);
+    if (current[0].email.toLowerCase() === newEmail.toLowerCase()) {
+      return res.status(400).json({ success: false, message: 'Email baru tidak boleh sama dengan email saat ini.' });
+    }
+
+    // Generate OTP 6-digit
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    const expires = new Date(Date.now() + 15 * 60000); // 15 menit
+
+    await pool.query(
+      'UPDATE users SET email_change_otp = $1, email_change_otp_expires = $2, email_change_new_email = $3 WHERE id = $4',
+      [otp, expires, newEmail, userId]
+    );
+
+    const { sendEmailChangeOTP } = require('../utils/mailer');
+    await sendEmailChangeOTP(current[0].email, otp, newEmail);
+
+    res.json({
+      success: true,
+      message: `Kode OTP telah dikirim ke email lama Anda (${current[0].email}). Kode berlaku 15 menit.`,
+    });
+  } catch (error) {
+    console.error('Request email change error:', error);
+    res.status(500).json({ success: false, message: 'Terjadi kesalahan server.' });
+  }
+};
+
+// POST /api/auth/verify-email-change
+// Verifikasi OTP dan terapkan perubahan email
+const verifyEmailChange = async (req, res) => {
+  const { otp } = req.body;
+  const userId = req.user.id;
+
+  if (!otp) {
+    return res.status(400).json({ success: false, message: 'Kode OTP wajib diisi.' });
+  }
+
+  try {
+    const { rows } = await pool.query(
+      'SELECT email_change_otp, email_change_otp_expires, email_change_new_email FROM users WHERE id = $1',
+      [userId]
+    );
+    const user = rows[0];
+
+    if (!user.email_change_otp || !user.email_change_new_email) {
+      return res.status(400).json({ success: false, message: 'Tidak ada permintaan ganti email yang aktif.' });
+    }
+    if (new Date() > new Date(user.email_change_otp_expires)) {
+      return res.status(400).json({ success: false, message: 'Kode OTP sudah kedaluwarsa. Silakan minta ulang.' });
+    }
+    if (user.email_change_otp !== otp.trim()) {
+      return res.status(400).json({ success: false, message: 'Kode OTP tidak valid. Periksa kembali kode yang dikirim ke email Anda.' });
+    }
+
+    // Terapkan perubahan email & bersihkan kolom OTP
+    await pool.query(
+      `UPDATE users
+       SET email = $1,
+           email_change_otp = NULL,
+           email_change_otp_expires = NULL,
+           email_change_new_email = NULL
+       WHERE id = $2`,
+      [user.email_change_new_email, userId]
+    );
+
+    res.json({
+      success: true,
+      message: `Email berhasil diperbarui menjadi ${user.email_change_new_email}.`,
+    });
+  } catch (error) {
+    console.error('Verify email change error:', error);
+    res.status(500).json({ success: false, message: 'Terjadi kesalahan server.' });
+  }
+};
+
+module.exports = {
+  register, login, getMe, updateProfile, updateAvatar, verifyEmail,
+  forgotPassword, resetPassword,
+  changePassword, requestEmailChange, verifyEmailChange,
+};

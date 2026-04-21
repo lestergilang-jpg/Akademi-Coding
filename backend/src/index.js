@@ -1,12 +1,28 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const { testConnection } = require('./config/database');
 
 const authRoutes = require('./routes/auth');
 const courseRoutes = require('./routes/courses');
 const transactionRoutes = require('./routes/transactions');
 const adminRoutes = require('./routes/admin');
+
+// ─── Rate Limiter: Login ─────────────────────────────────────
+// Maksimal 5 percobaan gagal per IP dalam 15 menit
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 menit
+  max: 5,
+  skipSuccessfulRequests: true, // Hanya hitung request yang GAGAL
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Terlalu banyak percobaan login yang gagal. Akun Anda dikunci sementara selama 15 menit. Silakan coba lagi nanti atau gunakan fitur Lupa Password.',
+    retryAfter: 15,
+  },
+});
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -24,6 +40,8 @@ const path = require('path');
 app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
 // ─── Routes ─────────────────────────────────────────────────
+// Terapkan rate limiter KHUSUS pada endpoint login
+app.use('/api/auth/login', loginLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/transactions', transactionRoutes);

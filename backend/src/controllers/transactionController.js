@@ -1,6 +1,7 @@
 const midtransClient = require('midtrans-client');
 const { v4: uuidv4 } = require('uuid');
 const { pool } = require('../config/database');
+const { sendInvoiceEmail } = require('../utils/mailer');
 
 const snap = new midtransClient.Snap({
   isProduction: process.env.MIDTRANS_IS_PRODUCTION === 'true',
@@ -58,6 +59,13 @@ const createTransaction = async (req, res) => {
 
     // Save snap token
     await pool.query('UPDATE transactions SET snap_token = $1 WHERE id = $2', [snapResponse.token, orderId]);
+
+    // Send Invoice Email
+    try {
+      await sendInvoiceEmail(req.user.email, req.user.name, orderId, course.title, course.price);
+    } catch (mailError) {
+      console.error('Invoice email failed to send:', mailError);
+    }
 
     res.json({ success: true, data: { snap_token: snapResponse.token, order_id: orderId } });
   } catch (error) {

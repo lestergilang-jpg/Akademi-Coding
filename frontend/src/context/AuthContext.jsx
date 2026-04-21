@@ -28,8 +28,8 @@ export function AuthProvider({ children }) {
     return data.data.user;
   };
 
-  const register = async (name, email, password) => {
-    const { data } = await api.post('/auth/register', { name, email, password });
+  const register = async (name, email, password, whatsapp_number, promo_code) => {
+    const { data } = await api.post('/auth/register', { name, email, password, whatsapp_number, promo_code });
     if (data.data && data.data.token) {
       Cookies.set('token', data.data.token, { expires: 7 });
       setUser(data.data.user);

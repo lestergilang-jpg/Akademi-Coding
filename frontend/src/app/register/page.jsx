@@ -4,13 +4,14 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import toast from 'react-hot-toast';
-import { FiUser, FiMail, FiLock, FiCode, FiEye, FiEyeOff, FiArrowRight, FiCheck } from 'react-icons/fi';
+import { FiUser, FiMail, FiLock, FiCode, FiEye, FiEyeOff, FiArrowRight, FiCheck, FiPhone, FiTag } from 'react-icons/fi';
 
 export default function RegisterPage() {
   const { register } = useAuth();
   const router = useRouter();
-  const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [form, setForm] = useState({ name: '', email: '', whatsapp_number: '', password: '', passwordConfirm: '', promo_code: '' });
   const [showPass, setShowPass] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const passwordStrength = (pass) => {
@@ -29,9 +30,10 @@ export default function RegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (form.password.length < 8) return toast.error('Password minimal 8 karakter');
+    if (form.password !== form.passwordConfirm) return toast.error('Password dan Konfirmasi Password tidak cocok');
     setLoading(true);
     try {
-      const res = await register(form.name, form.email, form.password);
+      const res = await register(form.name, form.email, form.password, form.whatsapp_number, form.promo_code);
       if (res?.requireVerification) {
         toast.success('Cek Email Anda! Link verifikasi telah dikirim.', { duration: 6000 });
         router.push('/login?registered=true');
@@ -88,26 +90,65 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Password</label>
+              <label className="block text-sm font-medium text-slate-300 mb-2">Nomor WhatsApp</label>
               <div className="relative">
-                <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-                <input type={showPass ? 'text' : 'password'} placeholder="Min. 8 karakter" value={form.password}
-                  onChange={e => setForm({ ...form, password: e.target.value })}
-                  className="input-field pl-10 pr-10" required />
-                <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
-                  {showPass ? <FiEyeOff /> : <FiEye />}
-                </button>
+                <FiPhone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                <input type="tel" placeholder="0812xxxxxx" value={form.whatsapp_number}
+                  onChange={e => setForm({ ...form, whatsapp_number: e.target.value })}
+                  className="input-field pl-10" required />
               </div>
-              {form.password && (
-                <div className="mt-2">
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4].map(i => (
-                      <div key={i} className={`h-1 flex-1 rounded-full transition-all ${i <= strength ? strengthColor : 'bg-white/10'}`} />
-                    ))}
-                  </div>
-                  <p className="text-xs text-slate-400 mt-1">{strengthLabel}</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">Password</label>
+                <div className="relative">
+                  <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                  <input type={showPass ? 'text' : 'password'} placeholder="Min. 8 karakter" value={form.password}
+                    onChange={e => setForm({ ...form, password: e.target.value })}
+                    className="input-field pl-10 pr-10" required />
+                  <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
+                    {showPass ? <FiEyeOff /> : <FiEye />}
+                  </button>
                 </div>
-              )}
+                {form.password && (
+                  <div className="mt-2">
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4].map(i => (
+                        <div key={i} className={`h-1 flex-1 rounded-full transition-all ${i <= strength ? strengthColor : 'bg-white/10'}`} />
+                      ))}
+                    </div>
+                    <p className="text-xs text-slate-400 mt-1">{strengthLabel}</p>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">Konfirmasi Password</label>
+                <div className="relative">
+                  <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                  <input type={showConfirmPass ? 'text' : 'password'} placeholder="Ulangi password" value={form.passwordConfirm}
+                    onChange={e => setForm({ ...form, passwordConfirm: e.target.value })}
+                    className="input-field pl-10 pr-10" required />
+                  <button type="button" onClick={() => setShowConfirmPass(!showConfirmPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
+                    {showConfirmPass ? <FiEyeOff /> : <FiEye />}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">Kode Promo <span className="text-slate-500 text-xs">(Opsional)</span></label>
+              <div className="relative">
+                <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                <input type="text" placeholder="Punya kode promo?" value={form.promo_code}
+                  onChange={e => setForm({ ...form, promo_code: e.target.value })}
+                  className="input-field pl-10" />
+              </div>
+            </div>
+
+            <div className="text-xs text-slate-400 mt-2">
+              Dengan mendaftar, Anda menyetujui <Link href="/terms" target="_blank" className="text-brand-400 hover:underline">Syarat & Ketentuan serta Kebijakan Privasi</Link> kami.
             </div>
 
             <button type="submit" disabled={loading} className="btn-primary w-full justify-center py-3.5 text-base disabled:opacity-60 disabled:cursor-not-allowed">

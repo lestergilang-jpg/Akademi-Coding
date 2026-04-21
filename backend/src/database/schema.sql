@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS users (
   verification_token VARCHAR(255),
   reset_password_token VARCHAR(255),
   reset_password_expires TIMESTAMP,
+  whatsapp_number VARCHAR(50),
+  promo_code VARCHAR(100),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
