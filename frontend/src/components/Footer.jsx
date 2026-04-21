@@ -42,7 +42,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="border-t border-white/10 mt-8 pt-6 text-center text-sm text-slate-500">
-          © {new Date().getFullYear()} CumaNgeprompt. All rights reserved. Made with ❤️ in Indonesia.
+          © {new Date().getFullYear()} CumaNgeprompt. All rights reserved. Made with love in Indonesia.
         </div>
       </div>
     </footer>

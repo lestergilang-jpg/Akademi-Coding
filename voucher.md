@@ -1,0 +1,1 @@
+saya mau membuat sistem kode promo juga, nantinya jika ada user yang memasukan kode promo yang dibuat admin melalui admin panel otomatis akan memotong nominal transaksi nya, buat implementasi nya di fix-voucher.md dan berikan saya pertanyaan jika ada yang perlu diklarifikasi

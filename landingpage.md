@@ -1,0 +1,1 @@
+tolong hilangkan semua emoticon di landing page halaman utama ya, saya kurang suka dengan adanya emoticon, dan tolong landing page nya bisa dikasih full animasi kayak fade in atau fade ou atau apa gitu biar keliatan keren apakah bisa? jadi ketika user ngescroll kebawah atau keatas itu ada animasinya gitu loh. dan juga tolong buatkan fix-landingpage.md

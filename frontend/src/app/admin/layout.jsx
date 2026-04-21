@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { 
   FiBarChart2, FiUsers, FiBook, FiDollarSign, 
-  FiHome, FiLogOut, FiMenu, FiX, FiCode, FiLayout
+  FiHome, FiLogOut, FiMenu, FiX, FiCode, FiLayout, FiTag
 } from 'react-icons/fi';
 
 const MENU_ITEMS = [
@@ -13,6 +13,7 @@ const MENU_ITEMS = [
   { label: 'Users', href: '/admin/users', icon: FiUsers },
   { label: 'Kursus', href: '/admin/kursus', icon: FiBook },
   { label: 'Transaksi', href: '/admin/transaksi', icon: FiDollarSign },
+  { label: 'Vouchers', href: '/admin/vouchers', icon: FiTag },
   { label: 'Landing Page', href: '/admin/settings', icon: FiLayout },
 ];
 

@@ -9,6 +9,7 @@ const courseRoutes = require('./routes/courses');
 const transactionRoutes = require('./routes/transactions');
 const adminRoutes = require('./routes/admin');
 const settingsRoutes = require('./routes/settings');
+const voucherRoutes = require('./routes/vouchers');
 
 // ─── Rate Limiter: Login ─────────────────────────────────────
 // Maksimal 5 percobaan gagal per IP dalam 15 menit
@@ -48,6 +49,7 @@ app.use('/api/courses', courseRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/vouchers', voucherRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

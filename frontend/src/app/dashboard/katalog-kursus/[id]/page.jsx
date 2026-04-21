@@ -32,6 +32,11 @@ export default function CourseDetailPage() {
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
+  
+  // Promo code states
+  const [promoCode, setPromoCode] = useState('');
+  const [appliedVoucher, setAppliedVoucher] = useState(null);
+  const [validating, setValidating] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -50,10 +55,29 @@ export default function CourseDetailPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  const handleValidatePromo = async () => {
+    if (!promoCode.trim()) return;
+    setValidating(true);
+    try {
+      const { data } = await api.post('/vouchers/validate', { code: promoCode, course_id: course.id });
+      setAppliedVoucher(data.data);
+      toast.success('Kode promo berhasil diterapkan! 🎉');
+    } catch (err) {
+      setAppliedVoucher(null);
+      toast.error(err.response?.data?.message || 'Kode promo tidak valid.');
+    } finally {
+      setValidating(false);
+    }
+  };
+
   const handleBuy = async () => {
     setPaying(true);
     try {
-      const { data } = await api.post('/transactions/create', { course_id: course.id });
+      const { data } = await api.post('/transactions/create', { 
+        course_id: course.id,
+        promo_code: appliedVoucher ? appliedVoucher.code : null
+      });
+      
       const script = document.createElement('script');
       script.src = 'https://app.sandbox.midtrans.com/snap/snap.js';
       script.setAttribute('data-client-key', process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY);
@@ -76,6 +100,7 @@ export default function CourseDetailPage() {
       setPaying(false);
     }
   };
+
 
   if (loading) return <LoadingState />;
   if (!course) return null;
@@ -156,29 +181,79 @@ export default function CourseDetailPage() {
           </div>
 
           {/* Paywall banner */}
-          {!user?.is_active && (
+          {!course?.has_access && (
             <div className="glass-card p-6 border border-brand-500/30 bg-gradient-to-r from-brand-500/10 to-accent-500/10 mb-6">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <div className="flex-1">
-                  <h3 className="text-white font-bold text-lg">🔒 Buka Semua Materi</h3>
-                  <p className="text-slate-400 text-sm mt-1">
-                    Sekarang kamu hanya bisa akses materi preview. Beli untuk unlock seluruh modul.
-                  </p>
+              <div className="flex flex-col gap-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  <div className="flex-1">
+                    <h3 className="text-white font-bold text-lg">🔒 Buka Semua Materi</h3>
+                    <p className="text-slate-400 text-sm mt-1">
+                      Sekarang kamu hanya bisa akses materi preview. Beli untuk unlock seluruh modul.
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    {appliedVoucher ? (
+                      <div className="flex flex-col items-end">
+                        <span className="text-slate-500 line-through text-sm">Rp {parseInt(course.price).toLocaleString('id-ID')}</span>
+                        <span className="text-brand-400 font-black text-2xl">Rp {parseInt(appliedVoucher.final_price).toLocaleString('id-ID')}</span>
+                        <span className="text-green-500 text-[10px] font-bold uppercase tracking-widest mt-1">Hemat Rp {parseInt(appliedVoucher.discount_amount).toLocaleString('id-ID')}!</span>
+                      </div>
+                    ) : (
+                      <span className="text-brand-400 font-bold text-2xl">
+                        Rp {parseInt(course.price).toLocaleString('id-ID')}
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <button
-                  onClick={handleBuy}
-                  disabled={paying}
-                  className="btn-primary shrink-0 disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                  {paying ? (
-                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+
+                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-white/5">
+                  <div className="flex-1 relative">
+                    <input 
+                      type="text" 
+                      placeholder="Masukkan Kode Promo..."
+                      value={promoCode}
+                      onChange={e => setPromoCode(e.target.value)}
+                      className="input-field py-2 text-sm uppercase tracking-widest"
+                      disabled={appliedVoucher || validating}
+                    />
+                    {appliedVoucher && (
+                      <button 
+                        onClick={() => {setAppliedVoucher(null); setPromoCode('');}}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
+                      >
+                        Hapus
+                      </button>
+                    )}
+                  </div>
+                  {!appliedVoucher ? (
+                    <button 
+                      onClick={handleValidatePromo}
+                      disabled={!promoCode || validating}
+                      className="btn-outline py-2 px-6 text-sm"
+                    >
+                      {validating ? 'Mengecek...' : 'Terapkan'}
+                    </button>
                   ) : (
-                    <><FiShoppingCart size={16} /> Beli — Rp {parseInt(course.price).toLocaleString('id-ID')}</>
+                    <div className="flex items-center gap-2 px-4 text-green-400 text-sm font-semibold">
+                      <FiCheckCircle /> Promo Aktif
+                    </div>
                   )}
-                </button>
+                  <button
+                    onClick={handleBuy}
+                    disabled={paying}
+                    className="btn-primary py-2 px-8 text-sm shrink-0 disabled:opacity-60"
+                  >
+                    {paying ? (
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <><FiShoppingCart size={16} /> Bayar Sekarang</>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           )}
+
         </div>
       </div>
 
@@ -190,7 +265,7 @@ export default function CourseDetailPage() {
         </div>
         <div className="p-2">
           {course.lessons?.map((lesson, idx) => {
-            const isAccessible = !lesson.is_locked || lesson.is_preview || user?.is_active;
+            const isAccessible = !lesson.is_locked || lesson.is_preview || course?.has_access;
             const isSelected = selectedLesson?.id === lesson.id;
             return (
               <button
