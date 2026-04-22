@@ -66,9 +66,19 @@ const upsertTestimonial = async (req, res) => {
 // GET /api/testimonials/public
 const getPublicTestimonials = async (req, res) => {
   try {
-    // Ambil limit dari settings (default 10)
-    const { rows: settingsRows } = await pool.query("SELECT value FROM settings WHERE key = 'max_testimonials_landing'");
-    const limit = settingsRows[0] ? parseInt(settingsRows[0].value) : 10;
+    // Default limit 10
+    let limit = 10;
+
+    // Coba ambil limit dari settings, jika gagal abaikan saja
+    try {
+      const { rows: sRows } = await pool.query("SELECT value FROM settings WHERE key = 'max_testimonials_landing'");
+      if (sRows.length > 0) {
+        const val = sRows[0].value;
+        limit = typeof val === 'object' ? (val.limit || 10) : (parseInt(val) || 10);
+      }
+    } catch (e) {
+      console.warn('Warning: Could not fetch max_testimonials_landing setting, using default 10');
+    }
 
     const { rows } = await pool.query(
       `SELECT t.*, u.name, u.avatar_url 
@@ -81,7 +91,7 @@ const getPublicTestimonials = async (req, res) => {
     );
     res.json({ success: true, data: rows });
   } catch (error) {
-    console.error('Get public testimonials error:', error);
+    console.error('CRITICAL: Get public testimonials error:', error);
     res.status(500).json({ success: false, message: 'Gagal mengambil testimoni.' });
   }
 };
