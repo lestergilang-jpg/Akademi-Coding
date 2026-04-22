@@ -1,20 +1,25 @@
 const { pool } = require('./config/database');
 
-async function updateExistingUsers() {
+async function updateToPremium() {
+  const email = 'acelagulina@gmail.com'; // Email dari log Midtrans tadi
   try {
-    console.log('Connecting to database...');
-    // Update existing users to be verified
-    const result = await pool.query(`
-      UPDATE users 
-      SET is_verified = TRUE 
-      WHERE is_verified = FALSE OR is_verified IS NULL
-    `);
-    console.log(`Successfully verified ${result.rowCount} existing users.`);
-  } catch (error) {
-    console.error('Error updating users:', error);
+    const res = await pool.query(
+      'UPDATE users SET is_active = TRUE WHERE email = $1 RETURNING id, name, email, is_active',
+      [email]
+    );
+
+    if (res.rowCount > 0) {
+      console.log('✅ BERHASIL!');
+      console.log('User Updated:', res.rows[0]);
+      console.log('\nSekarang akun Anda sudah Premium. Silakan refresh website atau Login ulang.');
+    } else {
+      console.log('❌ Gagal: User dengan email tersebut tidak ditemukan.');
+    }
+  } catch (err) {
+    console.error('❌ Terjadi kesalahan:', err.message);
   } finally {
-    pool.end();
+    await pool.end();
   }
 }
 
-updateExistingUsers();
+updateToPremium();
