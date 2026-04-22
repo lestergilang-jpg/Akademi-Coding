@@ -20,7 +20,7 @@ const sendVerificationEmail = async (toEmail, token) => {
   const verificationLink = `${backendUrl}/api/auth/verify-email?token=${token}`;
 
   const mailOptions = {
-    from: '"Cuma Ngeprompt" <noreply@cumangeprompt.my.id>',
+    from: '"Cuma Ngeprompt" <noreply@cumangeprompt.com>',
     to: toEmail,
     subject: 'Verifikasi Akun Cuma Ngeprompt Anda',
     html: `
@@ -61,7 +61,7 @@ const sendPasswordResetEmail = async (toEmail, token) => {
   const resetLink = `${frontendUrl}/reset-password?token=${token}`;
 
   const mailOptions = {
-    from: '"Cuma Ngeprompt" <noreply@cumangeprompt.my.id>',
+    from: '"Cuma Ngeprompt" <noreply@cumangeprompt.com>',
     to: toEmail,
     subject: 'Reset Password Cuma Ngeprompt Anda',
     html: `
@@ -100,7 +100,7 @@ const sendInvoiceEmail = async (toEmail, userName, orderId, courseTitle, amount)
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
   
   const mailOptions = {
-    from: '"Cuma Ngeprompt" <noreply@cumangeprompt.my.id>',
+    from: '"Cuma Ngeprompt" <noreply@cumangeprompt.com>',
     to: toEmail,
     subject: `Invoice Pembayaran - Cuma Ngeprompt [${orderId}]`,
     html: `
@@ -155,7 +155,7 @@ const sendInvoiceEmail = async (toEmail, userName, orderId, courseTitle, amount)
 
 const sendEmailChangeOTP = async (toEmail, otp, newEmail) => {
   const mailOptions = {
-    from: '"Cuma Ngeprompt" <noreply@cumangeprompt.my.id>',
+    from: '"Cuma Ngeprompt" <noreply@cumangeprompt.com>',
     to: toEmail,
     subject: 'Kode OTP Verifikasi Ganti Email — Cuma Ngeprompt',
     html: `

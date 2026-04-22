@@ -9,6 +9,7 @@ import {
   FiUser, FiCamera, FiSave, FiLock,
   FiChevronRight, FiMail, FiShield, FiX, FiCheckCircle
 } from 'react-icons/fi';
+import { getAvatarUrl } from '@/lib/utils';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000';
 
@@ -22,7 +23,7 @@ function AvatarSection({ user }) {
         {user?.avatar_url ? (
           <div className="w-20 h-20 rounded-2xl border-2 border-brand-500/50 overflow-hidden">
             <img 
-              src={user.avatar_url.startsWith('http') ? user.avatar_url : `${API_BASE}${user.avatar_url}`} 
+              src={getAvatarUrl(user.avatar_url)} 
               alt="Avatar" 
               className="w-full h-full object-cover" 
             />
@@ -408,7 +409,7 @@ export default function SettingPage() {
                 <div className="w-12 h-12 rounded-full border-2 border-[#5865F2]/50 overflow-hidden shrink-0">
                   {user.avatar_url ? (
                     <img 
-                      src={user.avatar_url.startsWith('http') ? user.avatar_url : `${API_BASE}${user.avatar_url}`} 
+                      src={getAvatarUrl(user.avatar_url)} 
                       alt="Discord Avatar" 
                       className="w-full h-full object-cover" 
                     />

@@ -6,8 +6,9 @@ const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
 const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
 const DISCORD_GUILD_ID = process.env.DISCORD_GUILD_ID;
 const DISCORD_ROLE_ID = process.env.DISCORD_ROLE_ID;
-// We will redirect to this backend endpoint:
-const REDIRECT_URI = `http://localhost:5000/api/auth/discord/callback`;
+// Use environment variable for the backend base URL
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
+const REDIRECT_URI = `${BACKEND_URL}/api/auth/discord/callback`;
 
 // GET /api/auth/discord/link
 const linkDiscord = (req, res) => {

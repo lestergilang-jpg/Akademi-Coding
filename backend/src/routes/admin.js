@@ -4,6 +4,7 @@ const { protect, adminOnly } = require('../middleware/auth');
 const { getUsers, toggleUserActive, getStats } = require('../controllers/adminController');
 const { adminGetTransactions } = require('../controllers/transactionController');
 const { adminGetVouchers, adminCreateVoucher, adminToggleVoucher, adminDeleteVoucher } = require('../controllers/voucherController');
+const { getAllTestimonials, toggleTestimonialStatus } = require('../controllers/testimonialController');
 
 router.use(protect, adminOnly);
 
@@ -17,5 +18,9 @@ router.get('/vouchers', adminGetVouchers);
 router.post('/vouchers', adminCreateVoucher);
 router.put('/vouchers/:id/toggle', adminToggleVoucher);
 router.delete('/vouchers/:id', adminDeleteVoucher);
+
+// Testimonials
+router.get('/testimonials', getAllTestimonials);
+router.patch('/testimonials/:id/status', toggleTestimonialStatus);
 
 module.exports = router;

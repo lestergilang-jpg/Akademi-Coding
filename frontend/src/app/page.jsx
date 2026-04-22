@@ -10,6 +10,7 @@ import {
   FiZap, FiBriefcase, FiUsers, FiAward, FiChevronDown,
   FiCode, FiGlobe, FiTrendingUp, FiGift,
 } from 'react-icons/fi';
+import { getAvatarUrl } from '@/lib/utils';
 
 // ─── ANIMATION VARIANTS ──────────────────────────────────────────────────────
 
@@ -36,13 +37,11 @@ const itemVariants = {
 
 // ─── DATA ─────────────────────────────────────────────────────────────────────
 
-const testimonials = [
-  { name: 'Aldi Firmansyah', role: 'Fresh Graduate → Frontend Dev', avatar: 'AF', stars: 5, text: 'Gila banget, dari ga tau HTML sama sekali, sekarang udah kerja di startup Jaksel dengan gaji 8jt. Kurikulum di sini beneran step by step, ga loncat-loncat.' },
-  { name: 'Sari Dewi', role: 'Ibu Rumah Tangga → Freelancer', avatar: 'SD', stars: 5, text: 'Belajar sambil ngurusin anak, alhamdulillah bisa. Sekarang freelance develop website UMKM, per project 3-5 jt. Worth banget investasinya!' },
-  { name: 'Rizky Pratama', role: 'Karyawan Pabrik → Web Dev', avatar: 'RP', stars: 5, text: 'Gue kerja shift, belajar malam hari 1-2 jam. 6 bulan kemudian resign dan dapet kerja remote. Income naik 3x lipat dari sebelumnya.' },
-  { name: 'Maya Sari', role: 'Mahasiswa → Freelancer', avatar: 'MS', stars: 5, text: 'Semester 3 udah bisa dapet side income dari freelance. Temen-temen heran kok bisa. Rahasianya ya belajar di CumaNgeprompt!' },
-  { name: 'Budi Santoso', role: 'Guru → Full Stack Dev', avatar: 'BS', stars: 5, text: 'Usia 35 belajar coding, banyak yang bilang udah telat. Buktinya sekarang jadi full stack developer. Umur bukan alasan!' },
-  { name: 'Tika Amalia', role: 'Admin Toko → UI Developer', avatar: 'TA', stars: 5, text: 'Mentor supportnya TOP BGT. Tiap ada yang ga ngerti langsung dibantu. Ga pernah ngerasa sendirian belajarnya.' },
+// Testimonials will be fetched from API
+const DEFAULT_TESTIMONIALS = [
+  { name: 'Aldi Firmansyah', occupation: 'Fresh Graduate → Frontend Dev', avatar_url: '', rating: 5, content: 'Gila banget, dari ga tau HTML sama sekali, sekarang udah kerja di startup Jaksel dengan gaji 8jt. Kurikulum di sini beneran step by step, ga loncat-loncat.' },
+  { name: 'Sari Dewi', occupation: 'Ibu Rumah Tangga → Freelancer', avatar_url: '', rating: 5, content: 'Belajar sambil ngurusin anak, alhamdulillah bisa. Sekarang freelance develop website UMKM, per project 3-5 jt. Worth banget investasinya!' },
+  { name: 'Rizky Pratama', occupation: 'Karyawan Pabrik → Web Dev', avatar_url: '', rating: 5, content: 'Gue kerja shift, belajar malam hari 1-2 jam. 6 bulan kemudian resign dan dapet kerja remote. Income naik 3x lipat dari sebelumnya.' },
 ];
 
 const curriculum = [
@@ -114,13 +113,26 @@ function FAQItem({ q, a }) {
 
 export default function LandingPage() {
   const [landingData, setLandingData] = useState(null);
+  const [realTestimonials, setRealTestimonials] = useState([]);
 
   useEffect(() => {
+    // Fetch Landing Page Settings
     api.get('/settings/landing_page')
       .then(({ data }) => {
         if (data.data) setLandingData(data.data);
       })
       .catch(() => console.log('Using default landing page data'));
+
+    // Fetch Public Testimonials
+    api.get('/testimonials/public')
+      .then(({ data }) => {
+        if (data.success && data.data.length > 0) {
+          setRealTestimonials(data.data);
+        } else {
+          setRealTestimonials(DEFAULT_TESTIMONIALS);
+        }
+      })
+      .catch(() => setRealTestimonials(DEFAULT_TESTIMONIALS));
   }, []);
 
   const heroData = landingData?.hero || {
@@ -274,19 +286,25 @@ export default function LandingPage() {
             <p className="section-subtitle">2.000+ alumni telah membuktikan. Sekarang giliran kamu.</p>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {testimonials.map((t, i) => (
+            {realTestimonials.map((t, i) => (
               <motion.div 
                 key={i} 
                 variants={itemVariants}
-                className="glass-card p-6 hover:border-brand-500/40 transition-all duration-300 hover:-translate-y-1"
+                className="glass-card p-6 hover:border-brand-500/40 transition-all duration-300 hover:-translate-y-1 flex flex-col"
               >
-                <StarRating count={t.stars} />
-                <p className="text-slate-300 mt-3 mb-4 leading-relaxed text-sm">"{t.text}"</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center text-white font-bold text-sm">{t.avatar}</div>
+                <StarRating count={t.rating} />
+                <p className="text-slate-300 mt-3 mb-6 leading-relaxed text-sm italic flex-1">"{t.content}"</p>
+                <div className="flex items-center gap-3 pt-4 border-t border-white/5">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center text-white font-bold text-sm overflow-hidden shrink-0 border border-white/10">
+                    {t.avatar_url ? (
+                      <img src={getAvatarUrl(t.avatar_url)} alt={t.name} className="w-full h-full object-cover" />
+                    ) : (
+                      t.name.charAt(0).toUpperCase()
+                    )}
+                  </div>
                   <div>
                     <div className="text-white font-semibold text-sm">{t.name}</div>
-                    <div className="text-slate-500 text-xs">{t.role}</div>
+                    <div className="text-slate-500 text-[10px] uppercase tracking-wider">{t.occupation}</div>
                   </div>
                 </div>
               </motion.div>

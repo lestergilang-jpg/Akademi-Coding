@@ -5,26 +5,27 @@ import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import {
   FiCode, FiBook, FiList, FiSettings, FiLogOut,
-  FiMenu, FiX, FiHome, FiChevronRight
+  FiMenu, FiX, FiHome, FiChevronRight, FiMessageSquare
 } from 'react-icons/fi';
+import { getAvatarUrl } from '@/lib/utils';
 
 // ─── Sidebar nav items ────────────────────────────────────────────────────────
 const NAV_ITEMS = [
   { href: '/dashboard',                label: 'Overview',          icon: FiHome },
   { href: '/dashboard/katalog-kursus', label: 'Katalog Kursus',   icon: FiBook },
   { href: '/dashboard/transaksi',      label: 'Riwayat Transaksi', icon: FiList },
+  { href: '/dashboard/testimoni',      label: 'Testimoni',         icon: FiMessageSquare },
   { href: '/dashboard/setting',        label: 'Pengaturan Profil', icon: FiSettings },
 ];
 
 // ─── Avatar helper ────────────────────────────────────────────────────────────
 function UserAvatar({ user, size = 10 }) {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000';
   const cls = `w-${size} h-${size} rounded-full border border-brand-500/60 overflow-hidden`;
   if (user?.avatar_url) {
     return (
       <div className={cls}>
         <img 
-          src={user.avatar_url.startsWith('http') ? user.avatar_url : `${API_URL}${user.avatar_url}`} 
+          src={getAvatarUrl(user.avatar_url)} 
           alt="Avatar" 
           className="w-full h-full object-cover" 
         />

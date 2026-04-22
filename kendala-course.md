@@ -41,3 +41,4 @@ ganti menjadi:
 ```
 
 Dengan perubahan ini, user hanya akan difilter berdasarkan hak aksesnya secara akurat sesuai data pembelian di `user_courses`. Jika Anda setuju, respon saya dan ini akan langsung saya terapkan ke dalam sintaks kodenya.
+

@@ -41,3 +41,5 @@ Tolong berikan jawabannya ya! Begitu *fix*, saya bisa langsung mengatur ulang _B
 1. saya mau pakai mailtrap sandbox dulu aja (bantu saya setup nya juga ya)
 2. user lama otomatis sudah terverifikasi (auto-verified)
 3. sesudah user mengklik URL konfirmasi dari kotak masuk email mereka, saya mau mereka dilempar / di-redirect otomatis ke halaman login frontend web saya
+
+
