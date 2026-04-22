@@ -150,6 +150,10 @@ const handleWebhook = async (req, res) => {
         
         if (courseId) {
           await pool.query('INSERT INTO user_courses (user_id, course_id, status) VALUES ($1, $2, $3) ON CONFLICT (user_id, course_id) DO UPDATE SET status = $3', [userId, courseId, 'active']);
+          
+          // Also update user status to active (Premium)
+          await pool.query('UPDATE users SET is_active = TRUE WHERE id = $1', [userId]);
+          console.log(`⭐ User ${userId} status updated to Premium (is_active = true)`);
         }
 
         // Record Voucher Usage
