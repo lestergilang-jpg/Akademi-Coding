@@ -20,7 +20,7 @@ const sendVerificationEmail = async (toEmail, token) => {
   const verificationLink = `${backendUrl}/api/auth/verify-email?token=${token}`;
 
   const mailOptions = {
-    from: '"Cuma Ngeprompt" <noreply@cumangeprompt.com>',
+    from: '"Cuma Ngeprompt" <noreply@cumangeprompt.my.id>',
     to: toEmail,
     subject: 'Verifikasi Akun Cuma Ngeprompt Anda',
     html: `
@@ -47,7 +47,13 @@ const sendVerificationEmail = async (toEmail, token) => {
     `
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`✅ Verification email sent to: ${toEmail}`);
+  } catch (error) {
+    console.error('❌ Error sending verification email:', error);
+    throw error;
+  }
 };
 
 const sendPasswordResetEmail = async (toEmail, token) => {
@@ -55,7 +61,7 @@ const sendPasswordResetEmail = async (toEmail, token) => {
   const resetLink = `${frontendUrl}/reset-password?token=${token}`;
 
   const mailOptions = {
-    from: '"Cuma Ngeprompt" <noreply@cumangeprompt.com>',
+    from: '"Cuma Ngeprompt" <noreply@cumangeprompt.my.id>',
     to: toEmail,
     subject: 'Reset Password Cuma Ngeprompt Anda',
     html: `
@@ -81,14 +87,20 @@ const sendPasswordResetEmail = async (toEmail, token) => {
     `
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`✅ Password reset email sent to: ${toEmail}`);
+  } catch (error) {
+    console.error('❌ Error sending password reset email:', error);
+    throw error;
+  }
 };
 
 const sendInvoiceEmail = async (toEmail, userName, orderId, courseTitle, amount) => {
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
   
   const mailOptions = {
-    from: '"Cuma Ngeprompt" <noreply@cumangeprompt.com>',
+    from: '"Cuma Ngeprompt" <noreply@cumangeprompt.my.id>',
     to: toEmail,
     subject: `Invoice Pembayaran - Cuma Ngeprompt [${orderId}]`,
     html: `
@@ -132,12 +144,18 @@ const sendInvoiceEmail = async (toEmail, userName, orderId, courseTitle, amount)
     `
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`✅ Invoice email sent to: ${toEmail}`);
+  } catch (error) {
+    console.error('❌ Error sending invoice email:', error);
+    throw error;
+  }
 };
 
 const sendEmailChangeOTP = async (toEmail, otp, newEmail) => {
   const mailOptions = {
-    from: '"Cuma Ngeprompt" <noreply@cumangeprompt.com>',
+    from: '"Cuma Ngeprompt" <noreply@cumangeprompt.my.id>',
     to: toEmail,
     subject: 'Kode OTP Verifikasi Ganti Email — Cuma Ngeprompt',
     html: `
@@ -165,7 +183,13 @@ const sendEmailChangeOTP = async (toEmail, otp, newEmail) => {
       </div>
     `
   };
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`✅ OTP email sent to: ${toEmail}`);
+  } catch (error) {
+    console.error('❌ Error sending OTP email:', error);
+    throw error;
+  }
 };
 
 module.exports = {
