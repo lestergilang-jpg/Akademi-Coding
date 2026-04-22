@@ -45,7 +45,7 @@ export default function CourseDetailPage() {
       .then(({ data }) => {
         setCourse(data.data);
         // Auto-select first accessible lesson
-        const first = data.data.lessons?.find(l => !l.is_locked || l.is_preview || user?.is_active);
+        const first = data.data.lessons?.find(l => !l.is_locked || l.is_preview || data.data.has_access);
         if (first) setSelectedLesson(first);
       })
       .catch(() => {
@@ -127,7 +127,7 @@ export default function CourseDetailPage() {
           <div className="glass-card overflow-hidden mb-6">
             {selectedLesson ? (
               <>
-                {selectedLesson.video_url && (user?.is_active || selectedLesson.is_preview) ? (
+                {selectedLesson.video_url && (course?.has_access || selectedLesson.is_preview) ? (
                   <div className="aspect-video w-full bg-black">
                     <iframe
                       src={selectedLesson.video_url}
