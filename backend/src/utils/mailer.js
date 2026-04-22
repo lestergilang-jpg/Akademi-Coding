@@ -2,11 +2,16 @@ const nodemailer = require('nodemailer');
 
 // Setup Mailtrap transporter using environment variables
 const transporter = nodemailer.createTransport({
-  host: process.env.MAILTRAP_HOST || "sandbox.smtp.mailtrap.io",
-  port: process.env.MAILTRAP_PORT || 2525,
+  host: process.env.MAILTRAP_HOST || "live.smtp.mailtrap.io",
+  port: parseInt(process.env.MAILTRAP_PORT) || 587,
+  secure: process.env.MAILTRAP_PORT == 465, // true for 465, false for other ports
   auth: {
     user: process.env.MAILTRAP_USER,
     pass: process.env.MAILTRAP_PASS
+  },
+  // Recommended for STARTTLS on port 587
+  tls: {
+    rejectUnauthorized: false // Helps avoid local cert issues, usually fine for SMTP
   }
 });
 
