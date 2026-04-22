@@ -4,7 +4,7 @@ import api from '@/lib/api';
 import toast from 'react-hot-toast';
 import { 
   FiPlus, FiEdit, FiTrash2, FiVideo, FiArrowLeft, FiX, 
-  FiCheckCircle, FiLock, FiPlay, FiClock, FiSearch
+  FiCheckCircle, FiLock, FiPlay, FiClock, FiSearch, FiBook
 } from 'react-icons/fi';
 
 export default function AdminKursusPage() {
