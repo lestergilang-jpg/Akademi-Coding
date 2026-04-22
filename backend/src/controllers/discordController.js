@@ -64,11 +64,33 @@ const discordCallback = async (req, res) => {
       headers: { 'Authorization': `Bearer ${discordAccessToken}` }
     });
     const meData = await meRes.json();
+    console.log('--- DISCORD PROFILE DATA ---');
+    console.log('ID:', meData.id);
+    console.log('Username:', meData.username);
+    console.log('Avatar Hash:', meData.avatar);
+
     const discordId = meData.id;
     const discordUsername = meData.username;
+    const discordAvatar = meData.avatar;
+
+    // Construct Discord Avatar URL
+    // Format: https://cdn.discordapp.com/avatars/{user_id}/{avatar_hash}.png
+    let avatarUrl = user.avatar_url;
+    if (discordAvatar) {
+      avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${discordAvatar}.png`;
+    } else {
+      // Default Discord Avatar if user doesn't have one
+      const defaultAvatarIndex = (BigInt(discordId) >> 22n) % 6n;
+      avatarUrl = `https://cdn.discordapp.com/embed/avatars/${defaultAvatarIndex}.png`;
+    }
+    
+    console.log('Final Avatar URL:', avatarUrl);
 
     // 4. Update Database
-    await pool.query('UPDATE users SET discord_id = $1, discord_username = $2 WHERE id = $3', [discordId, discordUsername, user.id]);
+    await pool.query(
+      'UPDATE users SET discord_id = $1, discord_username = $2, avatar_url = $3 WHERE id = $4', 
+      [discordId, discordUsername, avatarUrl, user.id]
+    );
 
     // 5. Add to Guild and Assign Role (if premium)
     if (user.is_active) {
@@ -113,4 +135,18 @@ const discordCallback = async (req, res) => {
   }
 };
 
-module.exports = { linkDiscord, discordCallback };
+// POST /api/auth/discord/unlink
+const unlinkDiscord = async (req, res) => {
+  try {
+    await pool.query(
+      'UPDATE users SET discord_id = NULL, discord_username = NULL, avatar_url = NULL WHERE id = $1',
+      [req.user.id]
+    );
+    res.json({ success: true, message: 'Berhasil memutuskan sambungan Discord.' });
+  } catch (error) {
+    console.error('Unlink Discord Error:', error);
+    res.status(500).json({ success: false, message: 'Gagal memutuskan sambungan.' });
+  }
+};
+
+module.exports = { linkDiscord, discordCallback, unlinkDiscord };

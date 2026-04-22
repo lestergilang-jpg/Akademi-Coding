@@ -13,52 +13,40 @@ import {
 const API_BASE = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000';
 
 // ─── Avatar Section ───────────────────────────────────────────────────────────
-function AvatarSection({ user, onRefresh }) {
-  const fileRef = useRef(null);
-  const [uploading, setUploading] = useState(false);
-
-  const handleFileChange = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 2 * 1024 * 1024) { toast.error('Ukuran maksimal foto adalah 2MB.'); return; }
-    const fd = new FormData();
-    fd.append('avatar', file);
-    setUploading(true);
-    try {
-      const { data } = await api.put('/auth/profile/avatar', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-      toast.success(data.message);
-      onRefresh();
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Gagal mengunggah foto.');
-    } finally {
-      setUploading(false);
-      if (fileRef.current) fileRef.current.value = '';
-    }
-  };
+function AvatarSection({ user }) {
+  const isDiscordConnected = !!user?.discord_id;
 
   return (
     <div className="flex items-center gap-5">
-      <div className="relative group cursor-pointer shrink-0" onClick={() => !uploading && fileRef.current?.click()}>
+      <div className="shrink-0">
         {user?.avatar_url ? (
           <div className="w-20 h-20 rounded-2xl border-2 border-brand-500/50 overflow-hidden">
-            <img src={`${API_BASE}${user.avatar_url}`} alt="Avatar" className="w-full h-full object-cover" />
+            <img 
+              src={user.avatar_url.startsWith('http') ? user.avatar_url : `${API_BASE}${user.avatar_url}`} 
+              alt="Avatar" 
+              className="w-full h-full object-cover" 
+            />
           </div>
         ) : (
           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center text-white text-3xl font-bold border-2 border-brand-500/50">
             {user?.name?.charAt(0).toUpperCase()}
           </div>
         )}
-        <div className="absolute inset-0 bg-black/60 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-          {uploading
-            ? <span className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            : <FiCamera className="text-white" size={20} />}
-        </div>
-        <input ref={fileRef} type="file" onChange={handleFileChange} accept="image/*" className="hidden" />
       </div>
       <div>
         <h3 className="text-white font-semibold">{user?.name}</h3>
         <p className="text-slate-400 text-sm">{user?.email}</p>
-        <p className="text-slate-500 text-xs mt-1">Klik foto untuk mengganti (maks 2MB)</p>
+        <div className="mt-1.5">
+          {isDiscordConnected ? (
+            <span className="text-brand-400 text-xs flex items-center gap-1.5 font-medium">
+              <FiCheckCircle size={14} /> Foto profil disinkronkan dengan Discord
+            </span>
+          ) : (
+            <span className="text-slate-500 text-xs italic">
+              Hubungkan Discord untuk menampilkan foto profil
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -415,15 +403,46 @@ export default function SettingPage() {
             Hubungkan akun Discord untuk bergabung ke komunitas eksklusif dan mendapatkan role Premium.
           </p>
           {user?.discord_id ? (
-            <div className="bg-[#5865F2]/10 border border-[#5865F2]/30 rounded-xl p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#5865F2] flex items-center justify-center text-white font-bold shrink-0">
-                {user.discord_username?.charAt(0).toUpperCase()}
+            <div className="space-y-4">
+              <div className="bg-[#5865F2]/10 border border-[#5865F2]/30 rounded-2xl p-4 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full border-2 border-[#5865F2]/50 overflow-hidden shrink-0">
+                  {user.avatar_url ? (
+                    <img 
+                      src={user.avatar_url.startsWith('http') ? user.avatar_url : `${API_BASE}${user.avatar_url}`} 
+                      alt="Discord Avatar" 
+                      className="w-full h-full object-cover" 
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-[#5865F2] flex items-center justify-center text-white font-bold">
+                      {user.discord_username?.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="text-white font-bold text-sm truncate">{user.discord_username}</p>
+                    <span className="badge bg-green-500/20 text-green-400 border-green-500/30 text-[10px] py-0 px-2">Terhubung</span>
+                  </div>
+                  <p className="text-[#7289da] text-xs mt-0.5">Akun Discord Anda telah sinkron</p>
+                </div>
               </div>
-              <div>
-                <p className="text-white font-medium text-sm">Terhubung dengan Discord</p>
-                <p className="text-[#7289da] text-xs">@{user.discord_username}</p>
-              </div>
-              <span className="ml-auto badge bg-green-500/20 text-green-400 border-green-500/30">Aktif</span>
+              
+              <button
+                onClick={async () => {
+                  if (confirm('Apakah Anda yakin ingin memutuskan sambungan Discord?')) {
+                    try {
+                      const { data } = await api.post('/auth/discord/unlink');
+                      toast.success(data.message);
+                      refreshUser();
+                    } catch (err) {
+                      toast.error('Gagal memutuskan sambungan.');
+                    }
+                  }
+                }}
+                className="flex items-center gap-2 text-xs text-red-400/70 hover:text-red-400 hover:bg-red-500/10 px-3 py-2 rounded-lg transition-all border border-red-500/10 hover:border-red-500/30"
+              >
+                <FiX size={14} /> Putus Sambungan Discord
+              </button>
             </div>
           ) : (
             <button

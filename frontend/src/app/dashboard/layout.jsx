@@ -23,7 +23,11 @@ function UserAvatar({ user, size = 10 }) {
   if (user?.avatar_url) {
     return (
       <div className={cls}>
-        <img src={`${API_URL}${user.avatar_url}`} alt="Avatar" className="w-full h-full object-cover" />
+        <img 
+          src={user.avatar_url.startsWith('http') ? user.avatar_url : `${API_URL}${user.avatar_url}`} 
+          alt="Avatar" 
+          className="w-full h-full object-cover" 
+        />
       </div>
     );
   }

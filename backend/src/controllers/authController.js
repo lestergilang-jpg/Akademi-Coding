@@ -172,27 +172,8 @@ const updateProfile = async (req, res) => {
   }
 };
 
-// PUT /api/auth/profile/avatar
-const updateAvatar = async (req, res) => {
-  try {
-    if (!req.file) {
-      console.log('⚠️ Upload attempt without file');
-      return res.status(400).json({ success: false, message: 'Tidak ada file gambar yang diunggah.' });
-    }
-    
-    console.log('📁 Processing avatar upload:', req.file.filename);
-    const avatarUrl = `/uploads/avatars/${req.file.filename}`;
-    
-    await pool.query('UPDATE users SET avatar_url = $1 WHERE id = $2', [avatarUrl, req.user.id]);
-    console.log('✅ Avatar URL updated in database for user:', req.user.id);
-    
-    const { rows } = await pool.query('SELECT id, name, email, role, is_active, avatar_url FROM users WHERE id = $1', [req.user.id]);
-    res.json({ success: true, message: 'Foto profil berhasil diperbarui.', data: { user: rows[0] } });
-  } catch (error) {
-    console.error('❌ Update avatar error:', error);
-    res.status(500).json({ success: false, message: 'Terjadi kesalahan server saat unggah foto.' });
-  }
-};
+// updateAvatar is now handled via Discord sync only
+
 
 // GET /api/auth/verify-email
 const verifyEmail = async (req, res) => {
@@ -436,7 +417,7 @@ const verifyEmailChange = async (req, res) => {
 };
 
 module.exports = {
-  register, login, getMe, updateProfile, updateAvatar, verifyEmail,
+  register, login, getMe, updateProfile, verifyEmail,
   forgotPassword, resetPassword,
   resendVerification,
   changePassword, requestEmailChange, verifyEmailChange,
