@@ -189,8 +189,7 @@ export default function LandingPage() {
             transition={{ duration: 0.8, delay: 0.1 }}
             className="text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed"
           >
-            Kuasai JavaScript Full-Stack dan dapatkan skill yang dicari perusahaan tech.
-            Cocok untuk pemula, siap kerja & freelance. Belajar sambil praktek project nyata.
+            {heroData.subtitle}
           </motion.p>
 
           {/* CTA */}
