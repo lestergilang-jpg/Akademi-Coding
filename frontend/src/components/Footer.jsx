@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { FiCode, FiInstagram, FiYoutube, FiTwitter } from 'react-icons/fi';
+import { FiCode } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
 
 export default function Footer() {
   return (
@@ -16,12 +17,16 @@ export default function Footer() {
             <p className="text-slate-400 text-sm max-w-xs leading-relaxed">
               Platform belajar coding terbaik untuk kamu yang ingin jadi web developer profesional dari nol.
             </p>
-            <div className="flex gap-4 mt-4">
-              {[FiInstagram, FiYoutube, FiTwitter].map((Icon, i) => (
-                <a key={i} href="#" className="text-slate-400 hover:text-white transition-colors">
-                  <Icon size={20} />
-                </a>
-              ))}
+            <div className="mt-4">
+              <a 
+                href="https://wa.me/6285189307255" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="flex items-center gap-2 text-slate-400 hover:text-[#25D366] transition-colors"
+              >
+                <FaWhatsapp size={20} />
+                <span className="text-sm font-medium">Contact us 085189307255 (WA Only)</span>
+              </a>
             </div>
           </div>
           <div>
