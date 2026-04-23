@@ -1,6 +1,7 @@
 import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
 import { Toaster } from 'react-hot-toast';
+import FloatingWA from '@/components/FloatingWA';
 
 export const metadata = {
   title: 'CumaNgeprompt – Belajar AI Deskripsi dari Nol Sampai Expert',
@@ -25,6 +26,7 @@ export default function RootLayout({ children }) {
             }}
           />
           {children}
+          <FloatingWA />
         </AuthProvider>
       </body>
     </html>

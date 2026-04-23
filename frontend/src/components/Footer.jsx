@@ -41,8 +41,14 @@ export default function Footer() {
             </ul>
           </div>
         </div>
-        <div className="border-t border-white/10 mt-8 pt-6 text-center text-sm text-slate-500">
-          © {new Date().getFullYear()} CumaNgeprompt. All rights reserved. Made with love in Indonesia.
+        <div className="border-t border-white/10 mt-8 pt-6 text-center text-xs sm:text-sm text-slate-500">
+          <p className="mb-2">
+            © 2026 CumaNgeprompt. All rights reserved. Made with love in Indonesia.
+          </p>
+          <div className="flex justify-center gap-4">
+            <Link href="/terms" className="hover:text-white transition-colors underline underline-offset-4">Terms & Conditions</Link>
+            <Link href="/terms#privacy" className="hover:text-white transition-colors underline underline-offset-4">Kebijakan Privasi</Link>
+          </div>
         </div>
       </div>
     </footer>

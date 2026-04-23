@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { FiArrowLeft } from 'react-icons/fi';
 
 export const metadata = {
-  title: 'Syarat & Ketentuan - Cuma Ngeprompt',
-  description: 'Syarat, ketentuan, dan kebijakan privasi Cuma Ngeprompt.',
+  title: 'Terms & Conditions - CumaNgeprompt',
+  description: 'Terms, conditions, and privacy policy of CumaNgeprompt.',
 };
 
 export default function TermsPage() {
@@ -11,58 +11,62 @@ export default function TermsPage() {
     <div className="min-h-screen bg-[#0a0a0f] text-slate-300 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         <Link href="/" className="inline-flex items-center gap-2 text-brand-400 hover:text-brand-300 mb-8 transition-colors">
-          <FiArrowLeft /> Kembali ke Beranda
+          <FiArrowLeft /> Back to Home
         </Link>
         
         <div className="glass-card p-8 md:p-10">
-          <h1 className="text-3xl font-bold text-white mb-8 border-b border-white/10 pb-4">Syarat & Ketentuan dan Kebijakan Privasi</h1>
+          <h1 className="text-3xl font-bold text-white mb-8 border-b border-white/10 pb-4">Terms & Conditions</h1>
 
-          <div className="space-y-6 text-sm leading-relaxed">
+          <div className="space-y-8 text-sm leading-relaxed">
             <section>
-              <h2 className="text-xl font-semibold text-white mb-2">1. Produk Tidak Dapat Dikembalikan</h2>
-              <p>Semua penjualan produk kami bersifat final. Setelah pembelian dilakukan, kami tidak menawarkan pengembalian dana, penggantian, atau penukaran. Harap pastikan Anda sudah mempertimbangkan dengan matang sebelum melakukan pembelian.</p>
+              <h2 className="text-xl font-semibold text-white mb-3">1. Non-Refundable Products</h2>
+              <p>All sales of our products are final. Once a purchase is made, we do not offer refunds, returns, or exchanges. Please ensure you have thoroughly considered your decision before making a purchase.</p>
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mb-2">2. Kebijakan Pembatalan</h2>
-              <p>Setelah pembelian selesai, pembatalan tidak diperbolehkan. Kebijakan ini berlaku untuk semua produk dan layanan yang ditawarkan. Tanggung jawab pelanggan untuk memastikan bahwa produk atau layanan memenuhi kebutuhan mereka sebelum melakukan pembelian.</p>
+              <h2 className="text-xl font-semibold text-white mb-3">2. Cancellation Policy</h2>
+              <p>Once a purchase has been completed, cancellations are not permitted. This policy applies to all products and services offered. It is the customer’s responsibility to ensure that the product or service meets their requirements before making a purchase.</p>
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mb-2">3. Akses Subscription tahunan ke Modul E-Course</h2>
-              <p>Modul e-course yang disediakan oleh kami menawarkan akses subscription tahunan. Ini berarti Anda akan memiliki akses selama 1 tahun (12 bulan) ke konten e-course selama masa ketersediaan kursus beserta dengan update serta fasilitas terbaru, tanpa biaya tambahan. Akses ini tidak berlaku untuk produk atau layanan lainnya yang kami tawarkan. Jika akses subscription dihentikan di masa depan, tim Cuma Ngeprompt berhak menempatkan video di platform mana pun tanpa melanjutkan layanan purna jual.</p>
+              <h2 className="text-xl font-semibold text-white mb-3">3. Subscription Annual Access to E-Course Modules</h2>
+              <p>Only the e-course modules provided by us come with yearly subscription access. This means you will have annual subscription access to the e-course content for the duration of 1 year (12 month) since registered without any additional fees or charges for any update and service. Access does not extend to any other products or services we offer. If subscription access is discontinued in the future, the CumaNgePrompt team reserves the right to place the videos on any platform, without continuing after-sales service.</p>
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mb-2">4. Pembaruan Reguler untuk Modul</h2>
-              <p>Kami berkomitmen untuk memberikan konten terbaru untuk modul e-course kami. Sebagai bagian dari komitmen ini, kami akan secara berkala memperbarui modul untuk mencerminkan informasi, teknik, dan praktik industri terbaru. Namun, penerapan pengetahuan dan keterampilan yang dipelajari dari modul-modul ini sepenuhnya menjadi tanggung jawab Anda sendiri.</p>
+              <h2 className="text-xl font-semibold text-white mb-3">4. Regular Updates to Modules</h2>
+              <p>We are committed to providing up-to-date content for our e-course modules. As part of this commitment, we will regularly update the modules to reflect the latest information, techniques, and industry practices. However, any application of the knowledge and skills learned from these modules is at your own risk.</p>
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mb-2">5. Kebijakan Penyesuaian Fasilitas, Produk, dan Layanan</h2>
-              <p>Cuma Ngeprompt berhak untuk mengubah, menambah, atau menghapus fasilitas, produk, dan layanan purna jual kapan saja tanpa pemberitahuan sebelumnya dan tanpa memerlukan persetujuan dari anggota.</p>
+              <h2 className="text-xl font-semibold text-white mb-3">5. Policy on Facility, Product, and Service Adjustments</h2>
+              <p>cumangeprompt reserves the right to modify, add, or remove facilities, products, and after-sales services at any time without prior notice and without requiring the consent of members.</p>
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mb-2">6. Batasan Tanggung Jawab</h2>
-              <p>Tim Cuma Ngeprompt tidak bertanggung jawab atas kerugian, kerusakan, atau hasil negatif yang dialami member akibat tindakan melanggar hukum setelah mendapat informasi dan teknik di modul e-course kami. Anggota melepaskan pendiri dan tim Cuma Ngeprompt, serta Mudacumasekali, dari segala konsekuensi hukum dan tanggung jawab yang muncul dari konten yang dibuat dan diposting oleh anggota di media sosial. Semua konsekuensi tersebut sepenuhnya menjadi tanggung jawab anggota.</p>
+              <h2 className="text-xl font-semibold text-white mb-3">6. Limitation of Liability</h2>
+              <p>The cumangeprompt team will not be responsible for any losses, damages, or negative outcomes incurred by members from applying the information and techniques learned in our e-course modules. The member releases the Founder and the CumaNgePrompt team, as well as Mudacumasekali, from any legal consequences and responsibilities arising from content created and posted by the member on social media. All such consequences shall be the sole responsibility of the member.</p>
+            </section>
+
+            <section id="privacy">
+              <h2 className="text-xl font-semibold text-white mb-3">7. Privacy Policy</h2>
+              <p>Your data is fully secure and will not be sold to third parties. The data will only be used for marketing purposes by CumaNgePrompt, Mudacumasekali and its partners.</p>
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mb-2">7. Kebijakan Privasi</h2>
-              <p>Data Anda sepenuhnya aman dan tidak akan dijual kepada pihak ketiga. Data hanya akan digunakan untuk tujuan pemasaran oleh Cuma Ngeprompt, Mudacumasekali, dan mitra-mitranya.</p>
+              <h2 className="text-xl font-semibold text-white mb-3">8. Member Conduct</h2>
+              <p>Members found engaging in piracy will be immediately removed and have their access terminated without a refund. Members found hacking will be immediately removed and have their access terminated without a refund. Members causing disruptions in the community will be immediately removed and have their access terminated without a refund. Any form of fraud or other misconduct will result in immediate removal and termination of access without a refund.</p>
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mb-2">8. Perilaku Anggota</h2>
-              <p>Anggota yang terbukti melakukan pembajakan akan segera dihapus dan aksesnya akan dihentikan tanpa pengembalian dana. Anggota yang terbukti meretas akan segera dihapus dan aksesnya dihentikan tanpa pengembalian dana. Anggota yang menyebabkan gangguan dalam komunitas akan segera dihapus dan aksesnya dihentikan tanpa pengembalian dana. Segala bentuk penipuan atau pelanggaran lainnya akan mengakibatkan penghapusan dan penghentian akses secara langsung tanpa pengembalian dana.</p>
+              <h2 className="text-xl font-semibold text-white mb-3">9. Amendments to the Terms and Conditions</h2>
+              <p>By agreeing to the Terms and Conditions of CumaNgePrompt, members consent to any future modifications or additions to the Terms and Conditions without the need for further approval.</p>
             </section>
 
-            <section>
-              <h2 className="text-xl font-semibold text-white mb-2">9. Perubahan pada Syarat dan Ketentuan</h2>
-              <p>Dengan menyetujui Syarat dan Ketentuan Cuma Ngeprompt, anggota menyetujui setiap modifikasi atau penambahan pada Syarat dan Ketentuan di masa depan tanpa memerlukan persetujuan lebih lanjut.</p>
-            </section>
-
+            <div className="pt-8 border-t border-white/10 italic text-slate-400">
+              <h3 className="text-lg font-semibold text-white mb-2 not-italic">Disclaimer</h3>
+              <p>Any results stated in the webinar and online course are our personal results. Please understand that our results are not typical, and we are not implying you will achieve similar outcomes, or even create any result for yourself. We are using these references for example purposes only. Your results will vary and depend on many deciding factors, such as (but not limited to) your background, experience, and commitment. Huge effort and action are required. If you’re not willing to accept that, please DO NOT JOIN THIS PROGRAM.</p>
+            </div>
           </div>
         </div>
       </div>
